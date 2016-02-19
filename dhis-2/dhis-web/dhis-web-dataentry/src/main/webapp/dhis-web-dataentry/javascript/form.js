@@ -591,20 +591,6 @@ dhis2.de.addEventListeners = function()
         } );
     } );
 
-    $( '.entryoptionset' ).each( function( i )
-    {
-        var id = $( this ).attr( 'id' );
-        var split = dhis2.de.splitFieldId( id );
-
-        var dataElementId = split.dataElementId;
-        var optionComboId = split.optionComboId;
-        
-        $( this ).change( function()
-        {
-            saveVal( dataElementId, optionComboId, id );
-        } );
-    } );
-
     $( '.commentlink' ).each( function( i )
     {
         var id = $( this ).attr( 'id' );
@@ -1530,6 +1516,8 @@ function clearFileEntryFields() {
 
     $fields.find( '.upload-field' ).css( 'background-color', dhis2.de.cst.colorWhite );
     $fields.find( 'input' ).val( '' );
+    
+    $('.select2-container').select2("val", "");
 }
 
 function getAndInsertDataValues()
@@ -2890,15 +2878,22 @@ function StorageManager()
  */
 dhis2.de.setOptionNameInField = function( fieldId, value )
 {
-	var optionSetUid = dhis2.de.optionSets[value.id].uid;
-	
-	DAO.store.get( 'optionSets', optionSetUid ).done( function( obj ) {		
+  var id = value.id;
+
+  if(value.id.split("-").length == 3)
+  {
+    id = id.substr(12);
+  }
+
+	var optionSetUid = dhis2.de.optionSets[id].uid;
+
+	DAO.store.get( 'optionSets', optionSetUid ).done( function( obj ) {
 		if ( obj && obj.optionSet && obj.optionSet.options ) {			
 			$.each( obj.optionSet.options, function( inx, option ) {
 				if ( option && option.code == value.val ) {
-                                        option.id = option.code;
-                                        option.text = option.name;					
-                                        $( fieldId ).select2("val", option.text );
+          option.id = option.code;
+          option.text = option.name;
+          $( fieldId ).select2("val", option.text );
 					return false;
 				}
 			} );
@@ -3034,6 +3029,14 @@ dhis2.de.loadOptionSets = function()
 dhis2.de.insertOptionSets = function() 
 {
     $( '.entryoptionset').each( function( idx, item ) {
+        
+        var fieldId = item.id;
+        
+        var split = dhis2.de.splitFieldId( fieldId );
+
+        var dataElementId = split.dataElementId;
+        var optionComboId = split.optionComboId;
+        
     	var optionSetKey = dhis2.de.splitFieldId( item.id );
         var s2prefix = 's2id_';        
         optionSetKey.dataElementId = optionSetKey.dataElementId.indexOf(s2prefix) != -1 ? optionSetKey.dataElementId.substring(s2prefix.length, optionSetKey.dataElementId.length) : optionSetKey.dataElementId;
@@ -3048,7 +3051,6 @@ dhis2.de.insertOptionSets = function()
         item = item + '-val';
         optionSetKey = optionSetKey.dataElementId + '-' + optionSetKey.optionComboId;
         var optionSetUid = dhis2.de.optionSets[optionSetKey].uid;
-        //dhis2.de.autocompleteOptionSetField( item, optionSetUid );
         
         DAO.store.get( 'optionSets', optionSetUid ).done( function( obj ) {
 		if ( obj && obj.optionSet && obj.optionSet.options ) {
@@ -3063,9 +3065,8 @@ dhis2.de.insertOptionSets = function()
                         allowClear: true,
                         dataType: 'json',
                         data: obj.optionSet.options
-                    }).on("select2:unselecting", function (e) {
-                        $(this).select2("val", "");
-                        e.preventDefault();
+                    }).on("change", function(e){
+                        saveVal( dataElementId, optionComboId, fieldId );
                     });
 		}		
 	} );        

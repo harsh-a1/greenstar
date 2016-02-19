@@ -44,28 +44,39 @@ public class HibernateUserKeyJsonValueStore
     extends HibernateIdentifiableObjectStore<UserKeyJsonValue>
     implements UserKeyJsonValueStore
 {
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<String> getKeysByUser( User user )
-    {
-        return (List<String>) getCriteria(
-            Restrictions.eq( "user", user ) ).list().stream().
-            map( o -> ((UserKeyJsonValue) o).getKey() ).collect( Collectors.toList() );
-    }
 
     @Override
-    public UserKeyJsonValue getUserKeyJsonValue( User user, String key )
+    public UserKeyJsonValue getUserKeyJsonValue( User user, String namespace, String key )
     {
         return (UserKeyJsonValue) getCriteria(
             Restrictions.eq( "user", user ),
+            Restrictions.eq( "namespace", namespace ),
             Restrictions.eq( "key", key ) ).uniqueResult();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<UserKeyJsonValue> getUserKeyJsonValueByUser( User user )
+    public List<String> getNamespacesByUser( User user )
     {
-        return getCriteria(
-            Restrictions.eq( "user", user ) ).list();
+        List<UserKeyJsonValue> queryResult = getCriteria( Restrictions.eq( "user", user ) ).list();
+        List<String> namespaces = queryResult.stream().map( UserKeyJsonValue::getNamespace ).distinct()
+            .collect( Collectors.toList() );
+
+        return namespaces;
+    }
+
+    @Override
+    public List<String> getKeysByUserAndNamespace( User user, String namespace )
+    {
+        return (getUserKeyJsonValueByUserAndNamespace( user, namespace )).stream().map( UserKeyJsonValue::getKey )
+            .collect( Collectors.toList() );
+    }
+
+    @Override
+    public List<UserKeyJsonValue> getUserKeyJsonValueByUserAndNamespace( User user, String namespace )
+    {
+        return (List<UserKeyJsonValue>) getCriteria(
+            Restrictions.eq( "user", user ),
+            Restrictions.eq( "namespace", namespace )
+        ).list();
     }
 }

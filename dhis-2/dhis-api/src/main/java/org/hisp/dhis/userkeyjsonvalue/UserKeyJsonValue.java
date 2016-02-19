@@ -44,14 +44,29 @@ public class UserKeyJsonValue
     private User user;
 
     /**
-     * A key belongs to a namespace, and represent a value
+     * A key belongs to a namespace and user, and represent a value
      */
     private String key;
 
     /**
-     * A value referenced by a key and user, JSON-formatted data stored as a string.
+     * A value referenced by a key, namespace and user, JSON-formatted data stored as a string
      */
     private String value;
+
+    /**
+     * A namespace is a collection of keys for a given user
+     */
+    private String namespace;
+
+    public String getNamespace()
+    {
+        return namespace;
+    }
+
+    public void setNamespace( String namespace )
+    {
+        this.namespace = namespace;
+    }
 
     @JsonProperty
     public String getKey()

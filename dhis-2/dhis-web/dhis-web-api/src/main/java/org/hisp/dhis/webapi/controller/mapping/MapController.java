@@ -158,7 +158,7 @@ public class MapController
             mappingService.addMapView( view );
         }
 
-        map.mergeWith( newMap, importOptions.getMergeStrategy() );
+        map.mergeWith( newMap, importOptions.getMergeMode() );
 
         if ( newMap.getUser() == null )
         {

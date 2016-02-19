@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.common.DxfNamespaces;
 
@@ -50,7 +49,7 @@ public class TrackedEntityInstance
     private String trackedEntityInstance;
 
     private String orgUnit;
-    
+
     private String created;
 
     private String lastUpdated;
@@ -58,7 +57,7 @@ public class TrackedEntityInstance
     private List<Relationship> relationships = new ArrayList<>();
 
     private List<Attribute> attributes = new ArrayList<>();
-    
+
     private Boolean inactive;
 
     public TrackedEntityInstance()
@@ -114,7 +113,7 @@ public class TrackedEntityInstance
     {
         this.orgUnit = orgUnit;
     }
-    
+
     @JsonProperty( required = true )
     @JacksonXmlProperty( isAttribute = true )
     public String getCreated()
@@ -163,17 +162,19 @@ public class TrackedEntityInstance
     {
         this.attributes = attributes;
     }
-    
+
     @JsonProperty
     @JacksonXmlElementWrapper( localName = "inactive", namespace = DxfNamespaces.DXF_2_0 )
     @JacksonXmlProperty( localName = "inactive", namespace = DxfNamespaces.DXF_2_0 )
-    public Boolean isInactive() {
-		return inactive;
-	}
+    public Boolean isInactive()
+    {
+        return inactive;
+    }
 
-	public void setInactive(Boolean inactive) {
-		this.inactive = inactive;
-	}
+    public void setInactive( Boolean inactive )
+    {
+        this.inactive = inactive;
+    }
 
     @Override
     public boolean equals( Object o )
@@ -218,5 +219,5 @@ public class TrackedEntityInstance
             ", attributes=" + attributes +
             ", inactive=" + inactive +
             '}';
-    }	
+    }
 }

@@ -47,7 +47,7 @@
                     <tr>
                         <td>{{'org_unit' | translate}}</td>
                         <td>
-                            <input type="text" class="form-control" selected-org-unit ng-model="selectedOrgUnit.name" value="{{selectedOrgUnit.name || 'please_select'| translate}}" ng-disabled="true">                                                                                        
+                            <input type="text" class="form-control" selected-org-unit ng-model="selectedOrgUnit.displayName" value="{{selectedOrgUnit.displayName || 'please_select'| translate}}" ng-disabled="true">                                                                                        
                         </td>
                     </tr>
                     <tr>
@@ -55,12 +55,13 @@
                             {{'program'| translate}}
                         </td>
                         <td>
-                            <select ng-model="selectedProgram"
-                                    class="form-control"
-                                    ng-options="program as program.name for program in programs | orderBy: 'name'" 
-                                    ng-disabled="programs.length < 1">
-                                <option value="">{{programs.length > 0 ? 'please_select_a_program' : 'no_program_exists'| translate}}</option>
-                            </select>
+                            <ui-select ng-model="model.selectedProgram" 
+                                    theme="select2" style="width:100%;">
+                                <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                                <ui-select-choices  repeat="program in programs | filter: $select.search | limitTo:maxOptionSize">
+                                    <span ng-bind-html="program.displayName | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
                         </td>
                     </tr>
                     <tr>
@@ -89,7 +90,7 @@
                 <div class="alert alert-warning">{{'no_program_exists_report'| translate}}</div> 
             </div>
         </div>
-        <div class="row" ng-if="programs.length > 0 && !selectedProgram">        
+        <div class="row" ng-if="programs.length > 0 && !model.selectedProgram">        
             <div class="col-sm-8 col-md-6 vertical-spacing">
                 <div class="alert alert-warning">{{'please_select_program_report'| translate}}</div> 
             </div>
@@ -138,7 +139,7 @@
                                     <!-- sort icon begins -->
                                     <span ng-click="sortGrid(gridColumn)">
                                         <span ng-class="{true: 'red'} [sortColumn.id === gridColumn.id]"><i class="fa fa-sort hideInPrint"></i></span>
-                                        {{gridColumn.name}}
+                                        {{gridColumn.displayName}}
                                     </span>
                                     <!-- sort icon ends -->
 

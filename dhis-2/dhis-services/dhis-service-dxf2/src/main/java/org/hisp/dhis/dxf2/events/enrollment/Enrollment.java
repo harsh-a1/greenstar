@@ -61,6 +61,8 @@ public class Enrollment
     private EnrollmentStatus status;
 
     private String orgUnit;
+    
+    private String orgUnitName;
 
     private Date enrollmentDate;
 
@@ -174,6 +176,18 @@ public class Enrollment
     public void setOrgUnit( String orgUnit )
     {
         this.orgUnit = orgUnit;
+    }
+    
+    @JsonProperty
+    @JacksonXmlProperty( isAttribute = true )
+    public String getOrgUnitName()
+    {
+        return orgUnitName;
+    }
+
+    public void setOrgUnitName( String orgUnitName )
+    {
+        this.orgUnitName = orgUnitName;
     }
 
     @JsonProperty( required = true )

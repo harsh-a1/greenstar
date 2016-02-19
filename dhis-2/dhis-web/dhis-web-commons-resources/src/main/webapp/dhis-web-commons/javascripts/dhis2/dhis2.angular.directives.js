@@ -34,7 +34,7 @@ var d2Directives = angular.module('d2Directives', [])
             //listen to user selection, and inform angular         
             selection.setListenerFunction(setSelectedOu, true);
             function setSelectedOu(ids, names) {
-                var ou = {id: ids[0], name: names[0]};
+                var ou = {id: ids[0], displayName: names[0]};
                 $timeout(function () {
                     scope.selectedOrgUnit = ou;
                     scope.$apply();

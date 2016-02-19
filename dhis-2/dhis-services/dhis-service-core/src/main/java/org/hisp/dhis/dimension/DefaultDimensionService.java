@@ -66,7 +66,7 @@ import org.hisp.dhis.common.DimensionalObjectUtils;
 import org.hisp.dhis.common.EventAnalyticalObject;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObjectManager;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.commons.collection.UniqueArrayList;
 import org.hisp.dhis.dataelement.CategoryOptionGroup;
 import org.hisp.dhis.dataelement.CategoryOptionGroupSet;
@@ -335,7 +335,7 @@ public class DefaultDimensionService
         DimensionalObject dimension = identifiableObjectManager.get( DimensionalObject.DYNAMIC_DIMENSION_CLASSES, uid );
         
         BaseDimensionalObject copy = new BaseDimensionalObject();
-        copy.mergeWith( dimension, MergeStrategy.MERGE_IF_NOT_NULL );
+        copy.mergeWith( dimension, MergeMode.MERGE_IF_NOT_NULL );
         
         if ( filterCanRead )
         {

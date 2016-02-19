@@ -36,7 +36,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
 import org.hisp.dhis.schema.annotation.PropertyRange;
@@ -150,9 +150,9 @@ public class OrganisationUnitLevel
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {

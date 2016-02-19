@@ -30,6 +30,7 @@ package org.hisp.dhis.common;
 
 import org.hisp.dhis.attribute.Attribute;
 import org.hisp.dhis.attribute.AttributeValue;
+import org.hisp.dhis.user.User;
 
 import java.util.List;
 
@@ -52,6 +53,15 @@ public interface GenericStore<T>
     int save( T object );
 
     /**
+     * Saves the given object instance, with clear sharing set to true.
+     *
+     * @param object the object instance.
+     * @param user   User
+     * @return the generated identifier.
+     */
+    int save( T object, User user );
+
+    /**
      * Saves the given object instance.
      *
      * @param object       the object instance.
@@ -61,11 +71,44 @@ public interface GenericStore<T>
     int save( T object, boolean clearSharing );
 
     /**
+     * Saves the given object instance.
+     *
+     * @param object       the object instance.
+     * @param user         User
+     * @param clearSharing Should we clear all sharing related properties?
+     * @return the generated identifier.
+     */
+    int save( T object, User user, boolean clearSharing );
+
+    /**
      * Updates the given object instance.
      *
      * @param object the object instance.
      */
     void update( T object );
+
+    /**
+     * Updates the given object instance.
+     *
+     * @param object the object instance.
+     * @param user   User
+     */
+    void update( T object, User user );
+
+    /**
+     * Removes the given object instance.
+     *
+     * @param object the object instance to delete.
+     */
+    void delete( T object );
+
+    /**
+     * Removes the given object instance.
+     *
+     * @param object the object instance to delete.
+     * @param user   User
+     */
+    void delete( T object, User user );
 
     /**
      * Retrieves the object with the given identifier. This method will first
@@ -106,13 +149,6 @@ public interface GenericStore<T>
      * @return a List of all objects.
      */
     List<T> getAll( int first, int max );
-
-    /**
-     * Removes the given object instance.
-     *
-     * @param object the object instance to delete.
-     */
-    void delete( T object );
 
     /**
      * Gets the count of objects.

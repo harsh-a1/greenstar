@@ -11,6 +11,8 @@ trackerCapture.controller('ProgramStatisticsController',
     $scope.ouModes = [{name: 'SELECTED'}, {name: 'CHILDREN'}, {name: 'DESCENDANTS'}, {name: 'ACCESSIBLE'}];         
     $scope.selectedOuMode = $scope.ouModes[0];
     $scope.report = {};
+    $scope.maxOptionSize = 30;
+    $scope.model = {};
     
     $scope.displayMode = {};
     $scope.printMode = false;
@@ -25,7 +27,7 @@ trackerCapture.controller('ProgramStatisticsController',
     //watch for selection of org unit from tree
     $scope.$watch('selectedOrgUnit', function() {      
         resetParams();
-        $scope.selectedProgram = null;
+        $scope.model.selectedProgram = null;
         if( angular.isObject($scope.selectedOrgUnit)){        
             $scope.loadPrograms($scope.selectedOrgUnit);
         }
@@ -35,16 +37,16 @@ trackerCapture.controller('ProgramStatisticsController',
     $scope.loadPrograms = function(orgUnit) {        
         $scope.selectedOrgUnit = orgUnit;        
         if (angular.isObject($scope.selectedOrgUnit)){
-            ProgramFactory.getProgramsByOu($scope.selectedOrgUnit, $scope.selectedProgram).then(function(response){
+            ProgramFactory.getProgramsByOu($scope.selectedOrgUnit, $scope.model.selectedProgram).then(function(response){
                 $scope.programs = response.programs;
-                $scope.selectedProgram = response.selectedProgram;
+                $scope.model.selectedProgram = response.selectedProgram;
             });
         }        
     };    
     
     //watch for selection of program
-    $scope.$watch('selectedProgram', function() {   
-        if( angular.isObject($scope.selectedProgram)){            
+    $scope.$watch('model.selectedProgram', function() {   
+        if( angular.isObject($scope.model.selectedProgram)){            
             resetParams();
         }
     });
@@ -63,13 +65,13 @@ trackerCapture.controller('ProgramStatisticsController',
 
     $scope.generateReport = function(program, report, ouMode){
         
-        $scope.selectedProgram = program;
+        $scope.model.selectedProgram = program;
         $scope.report = report;
         $scope.selectedOuMode = ouMode;
 
         //check for form validity
         $scope.outerForm.submitted = true;        
-        if( $scope.outerForm.$invalid || !$scope.selectedProgram){
+        if( $scope.outerForm.$invalid || !$scope.model.selectedProgram){
             return false;
         }
         
@@ -79,7 +81,7 @@ trackerCapture.controller('ProgramStatisticsController',
 
         $scope.enrollments = {active: 0, completed: 0, cancelled: 0};
         $scope.enrollmentList = [];
-        EnrollmentService.getByStartAndEndDate($scope.selectedProgram.id,
+        EnrollmentService.getByStartAndEndDate($scope.model.selectedProgram.id,
                                         $scope.selectedOrgUnit.id, 
                                         $scope.selectedOuMode.name,
                                         DateUtils.formatFromUserToApi($scope.report.startDate), 
@@ -104,7 +106,7 @@ trackerCapture.controller('ProgramStatisticsController',
                                         {key: 'Active', y: $scope.enrollments.active},
                                         {key: 'Cancelled', y: $scope.enrollments.cancelled}];
 
-                DHIS2EventFactory.getByOrgUnitAndProgram($scope.selectedOrgUnit.id, $scope.selectedOuMode.name, $scope.selectedProgram.id, null, null).then(function(data){
+                DHIS2EventFactory.getByOrgUnitAndProgram($scope.selectedOrgUnit.id, $scope.selectedOuMode.name, $scope.model.selectedProgram.id, null, null).then(function(data){
                     
                     if( data ) {
                         $scope.dhis2Events = {completed: 0, active: 0, skipped: 0, overdue: 0, ontime: 0};

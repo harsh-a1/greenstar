@@ -36,7 +36,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
@@ -140,22 +140,22 @@ public class Map
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             Map map = (Map) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 user = map.getUser();
                 longitude = map.getLongitude();
                 latitude = map.getLatitude();
                 zoom = map.getZoom();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 user = map.getUser() == null ? user : map.getUser();
                 longitude = map.getLongitude() == null ? longitude : map.getLongitude();

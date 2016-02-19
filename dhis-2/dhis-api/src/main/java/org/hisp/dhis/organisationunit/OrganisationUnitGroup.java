@@ -39,7 +39,7 @@ import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
@@ -169,20 +169,20 @@ public class OrganisationUnitGroup
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             OrganisationUnitGroup organisationUnitGroup = (OrganisationUnitGroup) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 groupSet = organisationUnitGroup.getGroupSet();
                 symbol = organisationUnitGroup.getSymbol();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 groupSet = organisationUnitGroup.getGroupSet() == null ? groupSet : organisationUnitGroup.getGroupSet();
                 symbol = organisationUnitGroup.getSymbol() == null ? symbol : organisationUnitGroup.getSymbol();

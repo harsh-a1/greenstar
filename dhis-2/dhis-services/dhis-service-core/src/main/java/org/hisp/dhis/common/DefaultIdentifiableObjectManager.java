@@ -36,8 +36,14 @@ import org.hisp.dhis.attribute.AttributeValue;
 import org.hisp.dhis.common.NameableObject.NameableProperty;
 import org.hisp.dhis.common.comparator.IdentifiableObjectNameComparator;
 import org.hisp.dhis.common.exception.InvalidIdentifierReferenceException;
+import org.hisp.dhis.dataelement.DataElementCategory;
+import org.hisp.dhis.dataelement.DataElementCategoryCombo;
+import org.hisp.dhis.dataelement.DataElementCategoryOption;
+import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.organisationunit.OrganisationUnitService;
+import org.hisp.dhis.user.CurrentUserService;
+import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +72,8 @@ public class DefaultIdentifiableObjectManager
 {
     private static final Log log = LogFactory.getLog( DefaultIdentifiableObjectManager.class );
 
+    private final Map<Class<? extends IdentifiableObject>, IdentifiableObject> DEFAULTS = new HashMap<>();
+
     @Autowired
     private Set<GenericIdentifiableObjectStore<? extends IdentifiableObject>> identifiableObjectStores;
 
@@ -81,6 +89,9 @@ public class DefaultIdentifiableObjectManager
     @Autowired
     private OrganisationUnitService organisationUnitService;
 
+    @Autowired
+    private CurrentUserService currentUserService;
+
     private Map<Class<? extends IdentifiableObject>, GenericIdentifiableObjectStore<? extends IdentifiableObject>> identifiableObjectStoreMap;
 
     private Map<Class<? extends NameableObject>, GenericNameableObjectStore<? extends NameableObject>> nameableObjectStoreMap;
@@ -94,33 +105,57 @@ public class DefaultIdentifiableObjectManager
     @Override
     public void save( IdentifiableObject object )
     {
-        save( object, true );
+        save( object, currentUserService.getCurrentUser(), true );
+    }
+
+    @Override
+    public void save( IdentifiableObject object, User user )
+    {
+        save( object, user, true );
     }
 
     @Override
     public void save( IdentifiableObject object, boolean clearSharing )
     {
+        save( object, currentUserService.getCurrentUser(), clearSharing );
+    }
+
+    @Override
+    public void save( IdentifiableObject object, User user, boolean clearSharing )
+    {
         GenericIdentifiableObjectStore<IdentifiableObject> store = getIdentifiableObjectStore( object.getClass() );
 
         if ( store != null )
         {
-            store.save( object, clearSharing );
+            store.save( object, user, clearSharing );
         }
     }
 
     @Override
     public void update( IdentifiableObject object )
     {
+        update( object, currentUserService.getCurrentUser() );
+    }
+
+    @Override
+    public void update( IdentifiableObject object, User user )
+    {
         GenericIdentifiableObjectStore<IdentifiableObject> store = getIdentifiableObjectStore( object.getClass() );
 
         if ( store != null )
         {
-            store.update( object );
+            store.update( object, user );
         }
     }
 
     @Override
     public void update( List<IdentifiableObject> objects )
+    {
+        update( objects, currentUserService.getCurrentUser() );
+    }
+
+    @Override
+    public void update( List<IdentifiableObject> objects, User user )
     {
         if ( objects == null || objects.isEmpty() )
         {
@@ -129,18 +164,24 @@ public class DefaultIdentifiableObjectManager
 
         for ( IdentifiableObject object : objects )
         {
-            update( object );
+            update( object, user );
         }
     }
 
     @Override
     public void delete( IdentifiableObject object )
     {
+        delete( object, currentUserService.getCurrentUser() );
+    }
+
+    @Override
+    public void delete( IdentifiableObject object, User user )
+    {
         GenericIdentifiableObjectStore<IdentifiableObject> store = getIdentifiableObjectStore( object.getClass() );
 
         if ( store != null )
         {
-            store.delete( object );
+            store.delete( object, user );
         }
     }
 
@@ -383,10 +424,10 @@ public class DefaultIdentifiableObjectManager
 
         return (List<T>) store.getByUid( uids );
     }
-    
+
     @Override
     @SuppressWarnings( "unchecked" )
-    public <T extends IdentifiableObject> List<T> getByCode(Class<T> clazz, Collection<String> codes) 
+    public <T extends IdentifiableObject> List<T> getByCode( Class<T> clazz, Collection<String> codes )
     {
         GenericIdentifiableObjectStore<IdentifiableObject> store = getIdentifiableObjectStore( clazz );
 
@@ -1069,6 +1110,20 @@ public class DefaultIdentifiableObjectManager
     {
         GenericIdentifiableObjectStore<IdentifiableObject> store = getIdentifiableObjectStore( klass );
         return store != null && store.isAttributeValueUnique( object, attribute, value );
+    }
+
+    @Override
+    public Map<Class<? extends IdentifiableObject>, IdentifiableObject> getDefaults()
+    {
+        if ( DEFAULTS.isEmpty() )
+        {
+            DEFAULTS.put( DataElementCategory.class, getByName( DataElementCategory.class, "default" ) );
+            DEFAULTS.put( DataElementCategoryCombo.class, getByName( DataElementCategoryCombo.class, "default" ) );
+            DEFAULTS.put( DataElementCategoryOption.class, getByName( DataElementCategoryOption.class, "default" ) );
+            DEFAULTS.put( DataElementCategoryOptionCombo.class, getByName( DataElementCategoryOptionCombo.class, "default" ) );
+        }
+
+        return DEFAULTS;
     }
 
     //--------------------------------------------------------------------------

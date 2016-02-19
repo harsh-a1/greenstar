@@ -36,7 +36,7 @@ trackerCapture.controller('RegistrationController',
     
     $scope.showHelpText = function(attributeId){
         $scope.helpTexts[attributeId] = $scope.helpTexts[attributeId] ? false : true;
-    }
+    };
     
     $scope.attributesById = CurrentSelection.getAttributesById();
     if(!$scope.attributesById){
@@ -62,7 +62,7 @@ trackerCapture.controller('RegistrationController',
     }
     
     $scope.selectedOrgUnit = SessionStorageService.get('SELECTED_OU');
-    $scope.selectedEnrollment = {enrollmentDate: $scope.today, incidentDate: $scope.today, orgUnitName: $scope.selectedOrgUnit.name};   
+    $scope.selectedEnrollment = {enrollmentDate: $scope.today, incidentDate: $scope.today, orgUnitName: $scope.selectedOrgUnit.displayName};   
             
     $scope.trackedEntities = {available: []};
     TEService.getAll().then(function(entities){
@@ -136,7 +136,7 @@ trackerCapture.controller('RegistrationController',
     var goToDashboard = function(destination, teiId){
         //reset form
         $scope.selectedTei = {};
-        $scope.selectedEnrollment = {enrollmentDate: $scope.today, incidentDate: $scope.today, orgUnitName: $scope.selectedOrgUnit.name};
+        $scope.selectedEnrollment = {enrollmentDate: $scope.today, incidentDate: $scope.today, orgUnitName: $scope.selectedOrgUnit.displayName};
         $scope.outerForm.submitted = false;
         $scope.outerForm.$setPristine();
 
@@ -286,7 +286,7 @@ trackerCapture.controller('RegistrationController',
                             }
                             else {
                                 //TODO: Alerts is going to be replaced with a proper display mecanism.
-                                alert($scope.attributesById[effect.trackedEntityAttribute.id].name + "Was blanked out and hidden by your last action");
+                                alert($scope.attributesById[effect.trackedEntityAttribute.id].displayName + "Was blanked out and hidden by your last action");
                             }
 
                             //Blank out the value:
@@ -424,9 +424,10 @@ trackerCapture.controller('RegistrationController',
             actionButtonText: 'yes',
             headerText: 'cancel',
             bodyText: 'are_you_sure_to_cancel_registration'
-        }
+        };
+        
         ModalService.showModal({}, modalOptions).then(function(){
             cancelFunction();
         });
-    }
+    };
 });

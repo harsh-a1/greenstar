@@ -39,7 +39,7 @@ import org.hisp.dhis.cache.HibernateCacheManager;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObjectManager;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.Pager;
 import org.hisp.dhis.common.PagerUtils;
 import org.hisp.dhis.dxf2.common.ImportOptions;
@@ -48,8 +48,6 @@ import org.hisp.dhis.dxf2.common.TranslateParams;
 import org.hisp.dhis.dxf2.importsummary.ImportStatus;
 import org.hisp.dhis.dxf2.metadata.ImportService;
 import org.hisp.dhis.dxf2.metadata.ImportTypeSummary;
-import org.hisp.dhis.render.DefaultRenderService;
-import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
 import org.hisp.dhis.fieldfilter.FieldFilterService;
 import org.hisp.dhis.hibernate.exception.CreateAccessDeniedException;
@@ -70,6 +68,8 @@ import org.hisp.dhis.query.Order;
 import org.hisp.dhis.query.Query;
 import org.hisp.dhis.query.QueryParserException;
 import org.hisp.dhis.query.QueryService;
+import org.hisp.dhis.render.DefaultRenderService;
+import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.schema.Property;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaService;
@@ -314,7 +314,7 @@ public abstract class AbstractCrudController<T extends IdentifiableObject>
 
         ImportOptions importOptions = new ImportOptions();
         importOptions.setStrategy( ImportStrategy.UPDATE );
-        importOptions.setMergeStrategy( MergeStrategy.MERGE );
+        importOptions.setMergeMode( MergeMode.MERGE );
 
         ImportTypeSummary importTypeSummary = importService.importObject( currentUserService.getCurrentUser().getUid(), persistedObject, importOptions );
 
@@ -389,7 +389,7 @@ public abstract class AbstractCrudController<T extends IdentifiableObject>
 
         ImportOptions importOptions = new ImportOptions();
         importOptions.setStrategy( ImportStrategy.UPDATE );
-        importOptions.setMergeStrategy( MergeStrategy.MERGE );
+        importOptions.setMergeMode( MergeMode.MERGE );
         ImportTypeSummary importTypeSummary = importService.importObject( currentUserService.getCurrentUser().getUid(), persistedObject, importOptions );
 
         webMessageService.send( WebMessageUtils.importTypeSummary( importTypeSummary ), response, request );

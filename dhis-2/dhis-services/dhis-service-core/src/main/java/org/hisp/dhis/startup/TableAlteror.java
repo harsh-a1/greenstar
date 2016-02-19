@@ -340,6 +340,7 @@ public class TableAlteror
         executeSql( "ALTER TABLE reporttable DROP COLUMN last12individualmonths" );
         executeSql( "ALTER TABLE reporttable DROP COLUMN individualmonthsthisyear" );
         executeSql( "ALTER TABLE reporttable DROP COLUMN individualquartersthisyear" );
+        executeSql( "ALTER TABLE reporttable DROP COLUMN programid" );
 
         executeSql( "ALTER TABLE chart DROP COLUMN last6months" );
         executeSql( "ALTER TABLE chart DROP COLUMN last9months" );
@@ -352,6 +353,7 @@ public class TableAlteror
         executeSql( "ALTER TABLE chart DROP COLUMN individualmonthsthisyear" );
         executeSql( "ALTER TABLE chart DROP COLUMN individualquartersthisyear" );
         executeSql( "ALTER TABLE chart DROP COLUMN organisationunitgroupsetid" );
+        executeSql( "ALTER TABLE chart DROP COLUMN programid" );
 
         // remove source
 

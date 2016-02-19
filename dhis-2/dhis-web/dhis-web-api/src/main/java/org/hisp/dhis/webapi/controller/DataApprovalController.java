@@ -701,7 +701,7 @@ public class DataApprovalController
         return approvals;
     }
 
-    private List<DataApproval> getDataApprovalList( Approvals approvals )
+    private List<DataApproval> getDataApprovalList( Approvals approvals ) throws WebMessageException
     {
         List<DataSet> dataSets = objectManager.getByUid( DataSet.class, approvals.getDs() );
         List<Period> periods = PeriodType.getPeriodsFromIsoStrings( approvals.getPe() );
@@ -714,6 +714,11 @@ public class DataApprovalController
 
         for ( DataSet dataSet : dataSets )
         {
+            if ( dataSet.getWorkflow() == null )
+            {
+                throw new WebMessageException( WebMessageUtils.conflict( "DataSet has no approval workflow: " + dataSet.getName() ) );
+            }
+
             Set<DataElementCategoryOptionCombo> dataSetOptionCombos = dataSet.getCategoryCombo() != null ? dataSet.getCategoryCombo().getOptionCombos() : null;
 
             for ( Approval approval : approvals.getApprovals() )

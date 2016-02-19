@@ -129,7 +129,7 @@ public class EventChartController
 
         mergeEventChart( newEventChart );
 
-        eventChart.mergeWith( newEventChart, importOptions.getMergeStrategy() );
+        eventChart.mergeWith( newEventChart, importOptions.getMergeMode() );
 
         eventChartService.updateEventChart( eventChart );
     }

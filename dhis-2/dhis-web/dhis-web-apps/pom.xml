@@ -57,6 +57,15 @@
                   <outputDirectory>${project.build.directory}/${project.artifactId}/dhis-web-app-management</outputDirectory>
                   <includes>**/*.*</includes>
                 </artifactItem>
+                <!-- App management -->
+                <artifactItem>
+                  <groupId>org.hisp.dhis</groupId>
+                  <artifactId>dhis-app-mapping</artifactId>
+                  <version>${apps.version}</version>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/${project.artifactId}/dhis-web-mapping</outputDirectory>
+                  <includes>**/*.*</includes>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

@@ -33,11 +33,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
@@ -61,7 +60,7 @@ public class ProgramRuleAction
 
     /**
      * The type of action that is performed when the action is effectuated
-     * <p/>
+     * <p>
      * The actual action the ruleaction row is performing. Allowed values are:
      * displaytext
      * Shows a text in the rulebound widget with the matching location string.
@@ -94,7 +93,7 @@ public class ProgramRuleAction
     /**
      * The data element that is affected by the rule action.
      * Used for:
-     * <p/>
+     * <p>
      * <ul>
      * <li>hidefield</li>
      * <li>showwarning</li>
@@ -102,11 +101,11 @@ public class ProgramRuleAction
      * </ul>
      */
     private DataElement dataElement;
-    
+
     /**
      * The data element that is affected by the rule action.
      * Used for:
-     * <p/>
+     * <p>
      * <ul>
      * <li>hidefield</li>
      * <li>showwarning</li>
@@ -128,7 +127,7 @@ public class ProgramRuleAction
      * The program stage section that is affected by the rule action.
      */
     private ProgramStageSection programStageSection;
-    
+
     /**
      * The program stage  that is affected by the rule action.
      */
@@ -136,7 +135,7 @@ public class ProgramRuleAction
 
     /**
      * Used to determine which widget to display data for the two action types:
-     * <p/>
+     * <p>
      * <ul>
      * <li>displaytext</li>
      * <li>displaykeydata</li>
@@ -163,8 +162,8 @@ public class ProgramRuleAction
 
     }
 
-    public ProgramRuleAction( String name, ProgramRule programRule, ProgramRuleActionType programRuleActionType, 
-        DataElement dataElement, TrackedEntityAttribute attribute, 
+    public ProgramRuleAction( String name, ProgramRule programRule, ProgramRuleActionType programRuleActionType,
+        DataElement dataElement, TrackedEntityAttribute attribute,
         ProgramStageSection programStageSection, ProgramStage programStage,
         ProgramIndicator programIndicator, String location, String content, String data )
     {
@@ -223,7 +222,7 @@ public class ProgramRuleAction
     {
         this.dataElement = dataElement;
     }
-    
+
     @JsonProperty( "trackedEntityAttribute" )
     @JsonSerialize( as = BaseIdentifiableObject.class )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
@@ -262,7 +261,7 @@ public class ProgramRuleAction
     {
         this.programStage = programStage;
     }
- 
+
     @JsonProperty
     @JsonSerialize( as = BaseIdentifiableObject.class )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
@@ -313,15 +312,15 @@ public class ProgramRuleAction
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             ProgramRuleAction programRuleAction = (ProgramRuleAction) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 programRule = programRuleAction.getProgramRule();
                 programRuleActionType = programRuleAction.getProgramRuleActionType();
@@ -332,7 +331,7 @@ public class ProgramRuleAction
                 data = programRuleAction.getData();
                 attribute = programRuleAction.getAttribute();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 programRule = programRuleAction.getProgramRule() == null ? programRule : programRuleAction.getProgramRule();
                 programRuleActionType = programRuleAction.getProgramRuleActionType() == null ? programRuleActionType : programRuleAction.getProgramRuleActionType();

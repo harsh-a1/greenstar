@@ -134,7 +134,7 @@ public class ChartController
 
         mergeChart( newChart );
 
-        chart.mergeWith( newChart, importOptions.getMergeStrategy() );
+        chart.mergeWith( newChart, importOptions.getMergeMode() );
 
         chartService.updateChart( chart );
     }

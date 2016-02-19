@@ -45,10 +45,12 @@ public class Option
 {
     public Option()
     {
+        setAutoFields();
     }
 
     public Option( String name, String code )
     {
+        this();
         this.name = name;
         this.code = code;
     }

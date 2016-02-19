@@ -64,65 +64,81 @@ public class UserKeyJsonValueController
     private CurrentUserService currentUserService;
 
     /**
-     * Returns a JSON array of strings representing the different keys used.
-     * If no keys exist, an empty array is returned.
+     * Returns a JSON array of strings representing the different namespaces used.
+     * If no namespaces exist, an empty array is returned.
      */
     @RequestMapping( value = "", method = RequestMethod.GET, produces = "application/json" )
     public
     @ResponseBody
-    List<String> getKeys( HttpServletResponse response )
+    List<String> getNamespaces( HttpServletResponse response )
         throws IOException
     {
-        return userKeyJsonValueService.getKeysByUser( currentUserService.getCurrentUser() );
+        return userKeyJsonValueService.getNamespacesByUser( currentUserService.getCurrentUser() );
     }
 
     /**
-     * Deletes all keys with the given user.
+     * Returns a JSON array of strings representing the different keys used in a given namespace.
+     * If no namespaces exist, an empty array is returned.
      */
-    @RequestMapping( value = "/", method = RequestMethod.DELETE )
-    public void deleteKeys( HttpServletResponse response )
+    @RequestMapping( value = "/{namespace}", method = RequestMethod.GET, produces = "application/json" )
+    public
+    @ResponseBody
+    List<String> getKeys( @PathVariable String namespace, HttpServletResponse response )
+        throws IOException
+    {
+        return userKeyJsonValueService.getKeysByUserAndNamespace( currentUserService.getCurrentUser(), namespace );
+    }
+
+    /**
+     * Deletes all keys with the given user and namespace.
+     */
+    @RequestMapping( value = "/{namespace}", method = RequestMethod.DELETE )
+    public void deleteKeys( @PathVariable String namespace, HttpServletResponse response )
         throws WebMessageException
     {
-        userKeyJsonValueService.cleanUserData( currentUserService.getCurrentUser() );
+        userKeyJsonValueService.deleteNamespaceFromUser( currentUserService.getCurrentUser(), namespace );
 
-        messageService.sendJson( WebMessageUtils.ok( "All keys deleted." ), response );
+        messageService
+            .sendJson( WebMessageUtils.ok( "All keys from namespace '" + namespace + "' deleted." ), response );
     }
 
     /**
-     * Retrieves the value of the KeyJsonValue represented by the given key from
+     * Retrieves the value of the KeyJsonValue represented by the given key and namespace from
      * the current user.
      */
-    @RequestMapping( value = "/{key}", method = RequestMethod.GET, produces = "application/json" )
+    @RequestMapping( value = "/{namespace}/{key}", method = RequestMethod.GET, produces = "application/json" )
     public
     @ResponseBody
     String getUserKeyJsonValue(
-        @PathVariable String key, HttpServletResponse response )
+        @PathVariable String namespace, @PathVariable String key, HttpServletResponse response )
         throws IOException, WebMessageException
     {
         UserKeyJsonValue userKeyJsonValue = userKeyJsonValueService.getUserKeyJsonValue(
-            currentUserService.getCurrentUser(), key );
+            currentUserService.getCurrentUser(), namespace, key );
 
         if ( userKeyJsonValue == null )
         {
             throw new WebMessageException( WebMessageUtils
-                .notFound( "The key '" + key + "' was not found." ) );
+                .notFound( "The key '" + key + "' was not found in the namespace '" + namespace + "'." ) );
         }
 
         return userKeyJsonValue.getValue();
     }
 
     /**
-     * Creates a new KeyJsonValue Object on the current user with the key and value supplied.
+     * Creates a new KeyJsonValue Object on the current user with the key, namespace and value supplied.
      */
-    @RequestMapping( value = "/{key}", method = RequestMethod.POST, produces = "application/json", consumes = "application/json" )
+    @RequestMapping( value = "/{namespace}/{key}", method = RequestMethod.POST, produces = "application/json", consumes = "application/json" )
     public void addUserKeyJsonValue(
-        @PathVariable String key, @RequestBody String body, HttpServletResponse response )
+        @PathVariable String namespace, @PathVariable String key, @RequestBody String body,
+        HttpServletResponse response )
         throws IOException, WebMessageException
     {
-        if ( userKeyJsonValueService.getUserKeyJsonValue( currentUserService.getCurrentUser(), key ) != null )
+        if ( userKeyJsonValueService.getUserKeyJsonValue( currentUserService.getCurrentUser(), namespace, key ) !=
+            null )
         {
             throw new WebMessageException( WebMessageUtils
-                .conflict( "The key '" + key + "' already exists." ) );
+                .conflict( "The key '" + key + "' already exists in the namespace '" + namespace + "'." ) );
         }
 
         if ( !renderService.isValidJson( body ) )
@@ -134,29 +150,33 @@ public class UserKeyJsonValueController
 
         userKeyJsonValue.setKey( key );
         userKeyJsonValue.setUser( currentUserService.getCurrentUser() );
+        userKeyJsonValue.setNamespace( namespace );
         userKeyJsonValue.setValue( body );
 
         userKeyJsonValueService.addUserKeyJsonValue( userKeyJsonValue );
 
         response.setStatus( HttpServletResponse.SC_CREATED );
-        messageService.sendJson( WebMessageUtils.created( "Key '" + key + "' created." ), response );
+        messageService
+            .sendJson( WebMessageUtils.created( "Key '" + key + "' in namespace '" + namespace + "' created." ),
+                response );
     }
 
     /**
      * Update a key.
      */
-    @RequestMapping( value = "/{key}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json" )
-    public void updateUserKeyJsonValue( @PathVariable String key, @RequestBody String body,
+    @RequestMapping( value = "/{namespace}/{key}", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json" )
+    public void updateUserKeyJsonValue( @PathVariable String namespace, @PathVariable String key,
+        @RequestBody String body,
         HttpServletRequest request, HttpServletResponse response )
         throws WebMessageException, IOException
     {
         UserKeyJsonValue userKeyJsonValue = userKeyJsonValueService.getUserKeyJsonValue(
-            currentUserService.getCurrentUser(), key );
+            currentUserService.getCurrentUser(), namespace, key );
 
         if ( userKeyJsonValue == null )
         {
             throw new WebMessageException( WebMessageUtils
-                .notFound( "The key '" + key + "' was not found." ) );
+                .notFound( "The key '" + key + "' was not found in the namespace '" + namespace + "'." ) );
         }
 
         if ( !renderService.isValidJson( body ) )
@@ -169,28 +189,31 @@ public class UserKeyJsonValueController
         userKeyJsonValueService.updateUserKeyJsonValue( userKeyJsonValue );
 
         response.setStatus( HttpServletResponse.SC_OK );
-        messageService.sendJson( WebMessageUtils.ok( "Key '" + key + "' updated." ), response );
+        messageService
+            .sendJson( WebMessageUtils.created( "Key '" + key + "' in namespace '" + namespace + "' updated." ),
+                response );
     }
 
     /**
      * Delete a key.
      */
-    @RequestMapping( value = "/{key}", method = RequestMethod.DELETE, produces = "application/json" )
+    @RequestMapping( value = "/{namespace}/{key}", method = RequestMethod.DELETE, produces = "application/json" )
     public void deleteUserKeyJsonValue(
+        @PathVariable String namespace,
         @PathVariable String key, HttpServletResponse response )
         throws WebMessageException
     {
         UserKeyJsonValue userKeyJsonValue = userKeyJsonValueService.getUserKeyJsonValue(
-            currentUserService.getCurrentUser(), key );
+            currentUserService.getCurrentUser(), namespace, key );
 
         if ( userKeyJsonValue == null )
         {
             throw new WebMessageException( WebMessageUtils
-                .notFound( "The key '" + key + "' was not found." ) );
+                .notFound( "The key '" + key + "' was not found in the namespace '" + namespace + "'." ) );
         }
 
         userKeyJsonValueService.deleteUserKeyJsonValue( userKeyJsonValue );
 
-        messageService.sendJson( WebMessageUtils.ok( "Key '" + key + "' deleted." ), response );
+        messageService.sendJson( WebMessageUtils.ok( "Key '" + key + "' deleted from the namespace '" + namespace + "'." ), response );
     }
 }

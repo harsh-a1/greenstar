@@ -39,7 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.cache.CacheStrategy;
 import org.hisp.dhis.common.cache.Cacheable;
 import org.hisp.dhis.common.view.DetailedView;
@@ -293,22 +293,22 @@ public class SqlView
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             SqlView sqlView = (SqlView) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 description = sqlView.getDescription();
                 sqlQuery = sqlView.getSqlQuery();
                 type = sqlView.getType();
                 cacheStrategy = sqlView.getCacheStrategy();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 description = sqlView.getDescription() == null ? description : sqlView.getDescription();
                 sqlQuery = sqlView.getSqlQuery() == null ? sqlQuery : sqlView.getSqlQuery();

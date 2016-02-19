@@ -65,6 +65,7 @@ public class UserKeyJsonValueStoreTest
 
         userKeyJsonValue.setValue( "{}" );
         userKeyJsonValue.setKey( "test" );
+        userKeyJsonValue.setNamespace( "a" );
         userKeyJsonValue.setUser( user );
 
         int id = userKeyJsonValueStore.save( userKeyJsonValue );
@@ -74,12 +75,13 @@ public class UserKeyJsonValueStoreTest
     }
 
     @Test
-    public void testAddUserKeyJsonValuesAndGetKeysByUser()
+    public void testAddUserKeyJsonValuesAndGetNamespacesByUser()
     {
         UserKeyJsonValue userKeyJsonValueA = new UserKeyJsonValue();
 
         userKeyJsonValueA.setValue( "{}" );
-        userKeyJsonValueA.setKey( "test_a" );
+        userKeyJsonValueA.setNamespace( "test_a" );
+        userKeyJsonValueA.setKey( "a" );
         userKeyJsonValueA.setUser( user );
 
         userKeyJsonValueStore.save(userKeyJsonValueA);
@@ -87,12 +89,13 @@ public class UserKeyJsonValueStoreTest
         UserKeyJsonValue userKeyJsonValueB = new UserKeyJsonValue();
 
         userKeyJsonValueB.setValue( "{}" );
-        userKeyJsonValueB.setKey( "test_b" );
+        userKeyJsonValueB.setNamespace( "test_b" );
+        userKeyJsonValueB.setKey( "b" );
         userKeyJsonValueB.setUser( user );
 
         userKeyJsonValueStore.save(userKeyJsonValueB);
 
-        List<String> list = userKeyJsonValueStore.getKeysByUser( user );
+        List<String> list = userKeyJsonValueStore.getNamespacesByUser( user );
 
         assertTrue( list.contains( "test_a" ) );
         assertTrue( list.contains( "test_b" ) );
@@ -104,6 +107,7 @@ public class UserKeyJsonValueStoreTest
         UserKeyJsonValue userKeyJsonValueA = new UserKeyJsonValue();
 
         userKeyJsonValueA.setValue( "{}" );
+        userKeyJsonValueA.setNamespace( "a" );
         userKeyJsonValueA.setKey( "test_a" );
         userKeyJsonValueA.setUser( user );
 
@@ -112,12 +116,13 @@ public class UserKeyJsonValueStoreTest
         UserKeyJsonValue userKeyJsonValueB = new UserKeyJsonValue();
 
         userKeyJsonValueB.setValue( "{}" );
+        userKeyJsonValueB.setNamespace( "a" );
         userKeyJsonValueB.setKey( "test_b" );
         userKeyJsonValueB.setUser( user );
 
         userKeyJsonValueStore.save(userKeyJsonValueB);
 
-        List<UserKeyJsonValue> list = userKeyJsonValueStore.getUserKeyJsonValueByUser( user );
+        List<UserKeyJsonValue> list = userKeyJsonValueStore.getUserKeyJsonValueByUserAndNamespace( user, "a" );
 
         assertTrue( list.contains( userKeyJsonValueA ) );
         assertTrue( list.contains( userKeyJsonValueB ) );

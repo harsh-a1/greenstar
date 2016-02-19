@@ -36,7 +36,7 @@ import com.google.common.base.MoreObjects;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
@@ -493,7 +493,6 @@ public class Attribute
     }
 
 
-
     public List<Class<? extends IdentifiableObject>> getSupportedClasses()
     {
         List<Class<? extends IdentifiableObject>> klasses = new ArrayList<>();
@@ -522,9 +521,9 @@ public class Attribute
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -551,12 +550,12 @@ public class Attribute
             optionSetAttribute = attribute.isOptionSetAttribute();
             mandatory = attribute.isMandatory();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 valueType = attribute.getValueType();
                 sortOrder = attribute.getSortOrder();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 valueType = attribute.getValueType() == null ? valueType : attribute.getValueType();
                 sortOrder = attribute.getSortOrder() == null ? sortOrder : attribute.getSortOrder();

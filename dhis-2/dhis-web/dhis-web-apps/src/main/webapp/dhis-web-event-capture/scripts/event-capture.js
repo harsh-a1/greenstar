@@ -286,20 +286,20 @@ function getAllPrograms( ids )
         return $.ajax( {
             url: '../api/programs.json',
             type: 'GET',
-            data: 'fields=id,name,programType,version,dataEntryMethod,enrollmentDateLabel,incidentDateLabel,displayIncidentDate,ignoreOverdueEvents,categoryCombo[id,name,isDefault,categories[id,name,categoryOptions[id,name]]],organisationUnits[id,name],programStages[id,name,version,description,excecutionDateLabel,captureCoordinates,dataEntryForm[id,name,style,htmlCode,format],minDaysFromStart,repeatable,preGenerateUID,programStageSections[id,name,programStageDataElements[dataElement[id]]],programStageDataElements[displayInReports,sortOrder,allowProvidedElsewhere,allowFutureDate,compulsory,dataElement[id,name,valueType,optionSetValue,formName,optionSet[id]]]],userRoles[id,name]&paging=false&filter=id:in:' + ids
+            data: 'fields=id,displayName,programType,version,dataEntryMethod,enrollmentDateLabel,incidentDateLabel,displayIncidentDate,ignoreOverdueEvents,categoryCombo[id,displayName,isDefault,categories[id,displayName,categoryOptions[id,displayName]]],organisationUnits[id,displayName],programStages[id,displayName,version,description,excecutionDateLabel,captureCoordinates,dataEntryForm[id,displayName,style,htmlCode,format],minDaysFromStart,repeatable,preGenerateUID,programStageSections[id,displayName,programStageDataElements[dataElement[id]]],programStageDataElements[displayInReports,sortOrder,allowProvidedElsewhere,allowFutureDate,compulsory,dataElement[id,displayName,url,description,valueType,optionSetValue,formName,optionSet[id]]]],userRoles[id,displayName]&paging=false&filter=id:in:' + ids
         }).done( function( response ){
             
             if(response.programs){
                 _.each(_.values( response.programs), function(program){
                     var ou = {};
                     _.each(_.values( program.organisationUnits), function(o){
-                        ou[o.id] = o.name;
+                        ou[o.id] = o.displayName;
                     });
                     program.organisationUnits = ou;
 
                     var ur = {};
                     _.each(_.values( program.userRoles), function(u){
-                        ur[u.id] = u.name;
+                        ur[u.id] = u.displayName;
                     });
                     program.userRoles = ur;
 
@@ -358,7 +358,7 @@ function getOptionSets( programs )
                 var _optionSetsInPromise = optionSetsInPromise.toString();
                 _optionSetsInPromise = '[' + _optionSetsInPromise + ']';
                 
-                var filter = 'fields=id,name,version,options[id,name,code]';                
+                var filter = 'fields=id,displayName,version,options[id,displayName,code]';                
                 filter = filter + '&filter=id:in:' + _optionSetsInPromise + '&paging=false';
                 
                 var url = '../api/optionSets';
@@ -384,7 +384,7 @@ function getMetaProgramValidations( programs, programIds )
 
 function getProgramValidations( programValidations )
 {  
-    return dhis2.tracker.checkAndGetTrackerObjects( programValidations, 'programValidations', '../api/programValidations', 'fields=id,name,name,operator,rightSide[expression,description],leftSide[expression,description],program[id]', dhis2.ec.store);
+    return dhis2.tracker.checkAndGetTrackerObjects( programValidations, 'programValidations', '../api/programValidations', 'fields=id,displayName,operator,rightSide[expression,description],leftSide[expression,description],program[id]', dhis2.ec.store);
 }
 
 function getMetaProgramIndicators( programs )
@@ -394,7 +394,7 @@ function getMetaProgramIndicators( programs )
 
 function getProgramIndicators( programIndicators )
 {
-    return dhis2.tracker.checkAndGetTrackerObjects( programIndicators, 'programIndicators', '../api/programIndicators', 'fields=id,name,code,shortName,displayInForm,expression,displayDescription,rootDate,description,valueType,name,filter,program[id]', dhis2.ec.store);
+    return dhis2.tracker.checkAndGetTrackerObjects( programIndicators, 'programIndicators', '../api/programIndicators', 'fields=id,displayName,code,shortName,displayInForm,expression,displayDescription,rootDate,description,valueType,filter,program[id]', dhis2.ec.store);
 }
 
 function getMetaProgramRules( programs )
@@ -404,7 +404,7 @@ function getMetaProgramRules( programs )
 
 function getProgramRules( programRules )
 {
-    return dhis2.tracker.checkAndGetTrackerObjects( programRules, 'programRules', '../api/programRules', 'fields=id,name,condition,description,program[id],programStage[id],priority,programRuleActions[id,content,location,data,programRuleActionType,programStageSection[id],dataElement[id],trackedEntityAttribute[id],programIndicator[id],programStage[id]]', dhis2.ec.store);
+    return dhis2.tracker.checkAndGetTrackerObjects( programRules, 'programRules', '../api/programRules', 'fields=id,displayName,condition,description,program[id],programStage[id],priority,programRuleActions[id,content,location,data,programRuleActionType,programStageSection[id],dataElement[id],trackedEntityAttribute[id],programIndicator[id],programStage[id]]', dhis2.ec.store);
 }
 
 function getMetaProgramRuleVariables( programs )
@@ -414,7 +414,7 @@ function getMetaProgramRuleVariables( programs )
 
 function getProgramRuleVariables( programRuleVariables )
 {
-    return dhis2.tracker.checkAndGetTrackerObjects( programRuleVariables, 'programRuleVariables', '../api/programRuleVariables', 'fields=id,name,name,programRuleVariableSourceType,program[id],programStage[id],dataElement[id]', dhis2.ec.store);
+    return dhis2.tracker.checkAndGetTrackerObjects( programRuleVariables, 'programRuleVariables', '../api/programRuleVariables', 'fields=id,displayName,programRuleVariableSourceType,program[id],programStage[id],dataElement[id]', dhis2.ec.store);
 }
 
 function uploadLocalData()

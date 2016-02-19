@@ -38,7 +38,7 @@ import org.hisp.dhis.chart.Chart;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
@@ -410,15 +410,15 @@ public class DashboardItem
     // -------------------------------------------------------------------------
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             DashboardItem dashboardItem = (DashboardItem) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 chart = dashboardItem.getChart();
                 map = dashboardItem.getMap();
@@ -429,7 +429,7 @@ public class DashboardItem
                 messages = dashboardItem.getMessages();
                 shape = dashboardItem.getShape();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 chart = dashboardItem.getChart() == null ? chart : dashboardItem.getChart();
                 map = dashboardItem.getMap() == null ? map : dashboardItem.getMap();

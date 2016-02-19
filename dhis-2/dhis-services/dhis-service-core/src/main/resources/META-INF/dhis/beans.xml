@@ -39,6 +39,8 @@
 
   <bean id="org.hisp.dhis.render.RenderService" class="org.hisp.dhis.render.DefaultRenderService" />
 
+  <bean id="org.hisp.dhis.schema.validation.SchemaValidator" class="org.hisp.dhis.schema.validation.DefaultSchemaValidator" />
+
   <!-- Store definitions -->
 
   <bean id="org.hisp.dhis.dataentryform.DataEntryFormStore" class="org.hisp.dhis.dataentryform.hibernate.HibernateDataEntryFormStore">

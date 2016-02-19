@@ -28,24 +28,23 @@ package org.hisp.dhis.dataentryform.hibernate;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.List;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hisp.dhis.common.hibernate.HibernateIdentifiableObjectStore;
 import org.hisp.dhis.dataentryform.DataEntryForm;
 import org.hisp.dhis.dataentryform.DataEntryFormStore;
 import org.hisp.dhis.dataset.DataSet;
-import org.hisp.dhis.hibernate.HibernateGenericStore;
 import org.hisp.dhis.program.ProgramStage;
+
+import java.util.List;
 
 /**
  * @author Bharath Kumar
- * @version $Id$
  */
 public class HibernateDataEntryFormStore
-    extends HibernateGenericStore<DataEntryForm>
+    extends HibernateIdentifiableObjectStore<DataEntryForm>
     implements DataEntryFormStore
 {
     // -------------------------------------------------------------------------

@@ -221,6 +221,16 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 var calendarSetting = CalendarService.getSetting();
                 dateValue = moment(dateValue, 'YYYY-MM-DD')._d;
                 return $filter('date')(dateValue, calendarSetting.keyDateFormat);
+            },
+            getDateAfterOffsetDays: function (offSetDays) {
+                var date = new Date();
+                date.setDate(date.getDate()+offSetDays);
+                var calendarSetting = CalendarService.getSetting();
+                var tdy = $.calendars.instance(calendarSetting.keyCalendar).fromJSDate(date);
+                var dateAfterOffset = moment(tdy._year + '-' + tdy._month + '-' + tdy._day, 'YYYY-MM-DD')._d;
+                dateAfterOffset = Date.parse(dateAfterOffset);
+                dateAfterOffset = $filter('date')(dateAfterOffset, calendarSetting.keyDateFormat);
+                return dateAfterOffset;
             }
         };
     })
@@ -231,7 +241,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
             getCode: function(options, key){
                 if(options){
                     for(var i=0; i<options.length; i++){
-                        if( key === options[i].name){
+                        if( key === options[i].displayName){
                             return options[i].code;
                         }
                     }
@@ -242,7 +252,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 if(options){
                     for(var i=0; i<options.length; i++){
                         if( key === options[i].code){
-                            return options[i].name;
+                            return options[i].displayName;
                         }
                     }
                 }
@@ -250,26 +260,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
             }
         };
     })
-
-    /*Orgunit service for local db */
-    .service('OrgUnitService', function($rootScope, $q){
-
-        return {
-            get: function(uid){
-                var def = $q.defer();
-                selection.getOrganisationUnit(uid).then(function(response){
-                    var ou = response && response[uid] && response[uid].n ? {id: uid, name: response[uid].n} : null;
-                    $rootScope.$apply(function(){
-                        def.resolve(ou);
-                    });
-                }, function(){
-                    def.resolve(null);
-                });
-                return def.promise;
-            }
-        };
-    })
-
+    
     /* service for common utils */
     .service('CommonUtils', function(DateUtils, OptionSetService, CurrentSelection, FileService){
 
@@ -414,15 +405,15 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                         ' ng-disabled="isHidden(prStDes.' + fieldId + '.dataElement.id) || selectedEnrollment.status===\'CANCELLED\' || selectedEnrollment.status===\'COMPLETED\' || currentEvent[uid]==\'uid\' || currentEvent.editingNotAllowed"' +
                                         ' ng-required="{{prStDes.' + fieldId + '.compulsory}}" ';
 
-                                    var auditField = '<d2-audit is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="{{prStDes.' + fieldId + '.dataElement.id}}" dataelement-name="{{prStDes[prStDes.' + fieldId + '.dataElement.id].dataElement.name}}" current-event="{{currentEvent.event}}"></d2-audit>';
+                                    var auditField = '<d2-audit is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="{{prStDes.' + fieldId + '.dataElement.id}}" dataelement-name="{{prStDes[prStDes.' + fieldId + '.dataElement.id].dataElement.displayName}}" current-event="{{currentEvent.event}}"></d2-audit>';
                                     //check if dataelement has optionset
                                     if (prStDe.dataElement.optionSetValue) {
                                         var optionSetId = prStDe.dataElement.optionSet.id;
                                         newInputField = '<span class="hideInPrint"><ui-select style="width: 90%;" theme="select2" ' + commonInputFieldProperty + ' on-select="saveDatavalue(prStDes.' + fieldId + ', outerForm.' + fieldId + ')" >' +
-                                            '<ui-select-match ng-class="getInputNotifcationClass(prStDes.' + fieldId + '.dataElement.id, true)" allow-clear="true" placeholder="' + $translate.instant('select_or_search') + '">{{$select.selected.name || $select.selected}}</ui-select-match>' +
+                                            '<ui-select-match ng-class="getInputNotifcationClass(prStDes.' + fieldId + '.dataElement.id, true)" allow-clear="true" placeholder="' + $translate.instant('select_or_search') + '">{{$select.selected.displayName || $select.selected}}</ui-select-match>' +
                                             '<ui-select-choices ' +
-                                            ' repeat="option.name as option in optionSets.' + optionSetId + '.options | filter: $select.search | limitTo:maxOptionSize">' +
-                                            '<span ng-bind-html="option.name | highlight: $select.search">' +
+                                            ' repeat="option.displayName as option in optionSets.' + optionSetId + '.options | filter: $select.search | limitTo:maxOptionSize">' +
+                                            '<span ng-bind-html="option.displayName | highlight: $select.search">' +
                                             '</span>' +
                                             '</ui-select-choices>' +
                                             '</ui-select></span><span class="not-for-screen"><input type="text" value={{currentEvent.' + fieldId + '}}></span>';
@@ -582,12 +573,12 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 if (att.optionSetValue) {
                                     var optionSetId = att.optionSet.id;
                                     newInputField = '<span ng-controller="InputController"><ui-select theme="select2" ' + commonInputFieldProperty + '  on-select="teiValueUpdated(selectedTei,\'' + attId + '\')" >' +
-                                        '<ui-select-match style="width:100%;" allow-clear="true" placeholder="' + $translate.instant('select_or_search') + '">{{$select.selected.name || $select.selected}}</ui-select-match>' +
+                                        '<ui-select-match style="width:100%;" allow-clear="true" placeholder="' + $translate.instant('select_or_search') + '">{{$select.selected.displayName || $select.selected}}</ui-select-match>' +
                                         '<ui-select-choices ' +
-                                        'repeat="option.name as option in optionSets.' + optionSetId + '.options | filter: $select.search | limitTo:maxOptionSize">' +
-                                        '<span ng-bind-html="option.name | highlight: $select.search"></span>' +
+                                        'repeat="option.displayName as option in optionSets.' + optionSetId + '.options | filter: $select.search | limitTo:maxOptionSize">' +
+                                        '<span ng-bind-html="option.displayName | highlight: $select.search"></span>' +
                                         '</ui-select-choices>' +
-                                        '</ui-select><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}}></d2-audit></span>';
+                                        '</ui-select><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}}></d2-audit></span>';
                                 }
                                 else {
                                     //check attribute type and generate corresponding angular input field
@@ -597,7 +588,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                             ' number-type="' + att.valueType + '" ' +
                                             ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
                                             commonInputFieldProperty + ' >' +
-                                            '<d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}}></d2-audit>' +
+                                            '<d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}}></d2-audit>' +
                                             '</span>';
                                     }
                                     else if (att.valueType === "BOOLEAN") {
@@ -618,39 +609,39 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                             ' d2-date' +
                                             ' blur-or-change="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
                                             commonInputFieldProperty + ' >'+
-                                            '<d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit>'+
+                                            '<d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit>'+
                                             '</span>';
                                     }
                                     else if (att.valueType === "TRUE_ONLY") {
                                         newInputField = '<span><input type="checkbox" ' +
                                             ' ng-change="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + ' ><d2-audit class="hideInPrint" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
+                                            commonInputFieldProperty + ' ><d2-audit class="hideInPrint" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
                                     }
                                     else if (att.valueType === "EMAIL") {
                                         newInputField = '<span ng-controller="InputController"><input type="email" ng-class="{\'input-with-audit\':inputObj.isAuditIconPresent}"' +
                                             ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + ' ><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
+                                            commonInputFieldProperty + ' ><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
                                     }
                                     else if (att.valueType === "TRACKER_ASSOCIATE") {
                                         newInputField = '<span ng-controller="InputController"><input type="text" ng-class="{\'input-with-audit\':inputObj.isAuditIconPresent}"' +
                                             ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + ' ><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>' +
-                                            '<span class="hideInPrint"><a href ng-class="{true: \'disable-clicks\', false: \'\'} [editingDisabled]" ng-click="getTrackerAssociate(attributesById.' + attId + ', selectedTei.' + attId + ')" title="{{\'add\' | translate}} {{attributesById.' + attId + '.name}}" ' +
+                                            commonInputFieldProperty + ' ><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>' +
+                                            '<span class="hideInPrint"><a href ng-class="{true: \'disable-clicks\', false: \'\'} [editingDisabled]" ng-click="getTrackerAssociate(attributesById.' + attId + ', selectedTei.' + attId + ')" title="{{\'add\' | translate}} {{attributesById.' + attId + '.displayName}}" ' +
                                             '<i class="fa fa-external-link fa-2x vertical-center"></i> ' +
                                             '</a> ' +
-                                            '<a href ng-if="selectedTei.' + attId + '" ng-class="{true: \'disable-clicks\', false: \'\'} [editingDisabled]" ng-click="selectedTei.' + attId + ' = null" title="{{\'remove\' | translate}} {{attributesById.' + attId + '.name}}" ' +
+                                            '<a href ng-if="selectedTei.' + attId + '" ng-class="{true: \'disable-clicks\', false: \'\'} [editingDisabled]" ng-click="selectedTei.' + attId + ' = null" title="{{\'remove\' | translate}} {{attributesById.' + attId + '.displayName}}" ' +
                                             '<i class="fa fa-trash-o fa-2x vertical-center"></i> ' +
                                             '</a></span>';
                                     }
                                     else if (att.valueType === "LONG_TEXT") {
                                         newInputField = '<span><textarea row ="3" ' +
                                             ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + ' ></textarea><d2-audit class="hideInPrint" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
+                                            commonInputFieldProperty + ' ></textarea><d2-audit class="hideInPrint" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
                                     }
                                     else {
                                         newInputField = '<span ng-controller="InputController"><input type="text" ' +
                                             ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + '><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
+                                            commonInputFieldProperty + '><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
                                     }
                                 }
                             }
@@ -680,7 +671,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                     ' ng-disabled="\'' + target + '\' === \'PROFILE\'"' +
                                     ' d2-date' +
                                     ' max-date="' + enMaxDate + '"' +
-                                    ' ng-required="true"><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
+                                    ' ng-required="true"><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
                             }
                             if (programId === 'dateOfIncident' && trackedEntityForm.displayIncidentDate) {
                                 fieldName = 'dateOfIncident';
@@ -694,7 +685,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                     ' ng-model="selectedEnrollment.dateOfIncident" ' +
                                     ' ng-disabled="\'' + target + '\' === \'PROFILE\'"' +
                                     ' d2-date ' +
-                                    ' max-date="' + inMaxDate + '"><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.name+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
+                                    ' max-date="' + inMaxDate + '"><d2-audit class="hideInPrint" is-audit-icon-present="inputObj.isAuditIconPresent" dataelement-id="'+att.id+'" dataelement-name="'+att.displayName+'" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}} ></d2-audit></span>';
                             }
                         }
 
@@ -1046,15 +1037,16 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                             var allValues = [];
                             angular.forEach(evs.byStage[programStageId], function(event) {
                                 if(event[dataElementId] !== null) {
-                                    if(angular.isDefined(event[dataElementId])){
+                                    if(angular.isDefined(event[dataElementId])
+                                            && event[dataElementId] !== ""){
                                         allValues.push(event[dataElementId]);
                                         valueFound = true;
-                                        variables = pushVariable(variables, programVariable.name, event[dataElementId],allValues, allDes[dataElementId].dataElement.valueType, valueFound, '#', event.eventDate);
+                                        variables = pushVariable(variables, programVariable.displayName, event[dataElementId],allValues, allDes[dataElementId].dataElement.valueType, valueFound, '#', event.eventDate);
                                     }
                                 }
                             });
                         } else {
-                            $log.warn("Variable id:'" + programVariable.id + "' name:'" + programVariable.name
+                            $log.warn("Variable id:'" + programVariable.id + "' name:'" + programVariable.displayName
                                 + "' does not have a programstage defined,"
                                 + " despite that the variable has sourcetype DATAELEMENT_NEWEST_EVENT_PROGRAM_STAGE" );
                         }
@@ -1063,18 +1055,20 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                         var allValues = [];
                         angular.forEach(evs.all, function(event) {
                             if(angular.isDefined(event[dataElementId])
-                                && event[dataElementId] !== null ){
+                                && event[dataElementId] !== null 
+                                && event[dataElementId] !== ""){
                                 allValues.push(event[dataElementId]);
                                 valueFound = true;
-                                variables = pushVariable(variables, programVariable.name, event[dataElementId], allValues, allDes[dataElementId].dataElement.valueType, valueFound, '#', event.eventDate);
+                                variables = pushVariable(variables, programVariable.displayName, event[dataElementId], allValues, allDes[dataElementId].dataElement.valueType, valueFound, '#', event.eventDate);
                             }
                         });
                     }
                     else if(programVariable.programRuleVariableSourceType === "DATAELEMENT_CURRENT_EVENT" && evs){
                         if(angular.isDefined(executingEvent[dataElementId])
-                            && executingEvent[dataElementId] !== null ){
+                            && executingEvent[dataElementId] !== null 
+                            && executingEvent[dataElementId] !== ""){
                             valueFound = true;
-                            variables = pushVariable(variables, programVariable.name, executingEvent[dataElementId], null, allDes[dataElementId].dataElement.valueType, valueFound, '#', executingEvent.eventDate );
+                            variables = pushVariable(variables, programVariable.displayName, executingEvent[dataElementId], null, allDes[dataElementId].dataElement.valueType, valueFound, '#', executingEvent.eventDate );
                         }
                     }
                     else if(programVariable.programRuleVariableSourceType === "DATAELEMENT_PREVIOUS_EVENT" && evs){
@@ -1088,7 +1082,8 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 //Store the values as we iterate through the stages
                                 //If the event[i] is not the current event, it is older(previous). Store the previous value if it exists
                                 if(!currentEventPassed && evs.all[i] !== executingEvent &&
-                                    angular.isDefined(evs.all[i][dataElementId])) {
+                                    angular.isDefined(evs.all[i][dataElementId])
+                                    && evs.all[i][dataElementId] !== "") {
                                     previousvalue = evs.all[i][dataElementId];
                                     previousEventDate = evs.all[i].eventDate;
                                     allValues.push(previousvalue);
@@ -1097,7 +1092,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 else if(evs.all[i] === executingEvent) {
                                     //We have iterated to the newest event - store the last collected variable value - if any is found:
                                     if(valueFound) {
-                                        variables = pushVariable(variables, programVariable.name, previousvalue, allValues, allDes[dataElementId].dataElement.valueType, valueFound, '#', previousEventDate);
+                                        variables = pushVariable(variables, programVariable.displayName, previousvalue, allValues, allDes[dataElementId].dataElement.valueType, valueFound, '#', previousEventDate);
                                     }
                                     //Set currentEventPassed, ending the iteration:
                                     currentEventPassed = true;
@@ -1108,11 +1103,13 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     else if(programVariable.programRuleVariableSourceType === "TEI_ATTRIBUTE"){
                         angular.forEach(selectedEntity.attributes , function(attribute) {
                             if(!valueFound) {
-                                if(attribute.attribute === trackedEntityAttributeId) {
+                                if(attribute.attribute === trackedEntityAttributeId
+                                        && angular.isDefined(attribute.value)
+                                        && attribute.value !== "") {
                                     valueFound = true;
                                     //In registration, the attribute type is found in .type, while in data entry the same data is found in .valueType.
                                     //Handling here, but planning refactor in registration so it will always be .valueType
-                                    variables = pushVariable(variables, programVariable.name, attribute.value, null, attribute.type ? attribute.type : attribute.valueType, valueFound, 'A', '' );
+                                    variables = pushVariable(variables, programVariable.displayName, attribute.value, null, attribute.type ? attribute.type : attribute.valueType, valueFound, 'A', '' );
                                 }
                             }
                         });
@@ -1135,20 +1132,20 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                         if(dataElementId && allDes) {
                             var dataElement = allDes[dataElementId];
                             if( dataElement ) {
-                                variables = pushVariable(variables, programVariable.name, "", null, dataElement.dataElement.valueType, false, '#', '' );
+                                variables = pushVariable(variables, programVariable.displayName, "", null, dataElement.dataElement.valueType, false, '#', '' );
                             }
                             else {
-                                $log.warn("Variable #{" + programVariable.name + "} is linked to a dataelement that is not part of the program");
-                                variables = pushVariable(variables, programVariable.name, "", null, "TEXT",false, '#', '' );
+                                $log.warn("Variable #{" + programVariable.displayName + "} is linked to a dataelement that is not part of the program");
+                                variables = pushVariable(variables, programVariable.displayName, "", null, "TEXT",false, '#', '' );
                             }
                         }
                         else if (programVariable.trackedEntityAttribute) {
                             //The variable is an attribute, set correct prefix and a blank value
-                            variables = pushVariable(variables, programVariable.name, "", null, "TEXT",false, 'A', '' );
+                            variables = pushVariable(variables, programVariable.displayName, "", null, "TEXT",false, 'A', '' );
                         }
                         else {
                             //Fallback for calculated(assigned) values:
-                            variables = pushVariable(variables, programVariable.name, "", null, "TEXT",false, '#', '' );
+                            variables = pushVariable(variables, programVariable.displayName, "", null, "TEXT",false, '#', '' );
                         }
                     }
                 });

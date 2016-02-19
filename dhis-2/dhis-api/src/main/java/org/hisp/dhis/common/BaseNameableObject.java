@@ -239,20 +239,20 @@ public class BaseNameableObject
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             NameableObject nameableObject = (NameableObject) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 this.shortName = nameableObject.getShortName();
                 this.description = nameableObject.getDescription();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 this.shortName = nameableObject.getShortName() == null ? this.shortName : nameableObject.getShortName();
                 this.description = nameableObject.getDescription() == null ? this.description : nameableObject.getDescription();

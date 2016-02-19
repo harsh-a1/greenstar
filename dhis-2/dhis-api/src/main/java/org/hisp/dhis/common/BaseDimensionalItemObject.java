@@ -28,23 +28,22 @@ package org.hisp.dhis.common;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
 import org.hisp.dhis.legend.LegendSet;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-
 /**
  * @author Lars Helge Overland
  */
 public class BaseDimensionalItemObject
-    extends BaseNameableObject 
-        implements DimensionalItemObject
+    extends BaseNameableObject
+    implements DimensionalItemObject
 {
     /**
      * The dimension type.
@@ -55,12 +54,12 @@ public class BaseDimensionalItemObject
      * The legend set for this dimension.
      */
     protected LegendSet legendSet;
-    
+
     /**
      * The aggregation type for this dimension.
      */
     protected AggregationType aggregationType;
-    
+
     // -------------------------------------------------------------------------
     // Constructors
     // -------------------------------------------------------------------------
@@ -85,7 +84,7 @@ public class BaseDimensionalItemObject
     {
         return getLegendSet() != null;
     }
-    
+
     @Override
     public boolean hasAggregationType()
     {
@@ -158,20 +157,20 @@ public class BaseDimensionalItemObject
     // -------------------------------------------------------------------------
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             DimensionalItemObject object = (DimensionalItemObject) other;
-            
-            if ( strategy.isReplace() )
+
+            if ( mergeMode.isReplace() )
             {
                 legendSet = object.getLegendSet();
                 aggregationType = object.getAggregationType();
             }
-            else if ( strategy.isReplace() )
+            else if ( mergeMode.isMerge() )
             {
                 legendSet = object.getLegendSet() == null ? legendSet : object.getLegendSet();
                 aggregationType = object.getAggregationType() == null ? aggregationType : object.getAggregationType();

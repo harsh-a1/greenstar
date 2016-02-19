@@ -44,20 +44,6 @@
 </div>
 <!-- event dates/scheduling end -->
 
-<div class="row col-sm-12" ng-if="selectedProgram" ng-repeat="category in selectedCategories">
-    <div class="col-sm-6">
-        {{category.name}}
-    </div>
-    <div class="col-sm-6">
-        <select class="form-control"
-                name="option"                             
-                ng-model="category.selectedOption"
-                ng-options="option as option.name for option in category.categoryOptions"
-                ng-change="getCategoryOptions()">
-            <option value="">{{pleaseSelectLabel}}</option>
-        </select>
-    </div>
-</div>
 <!-- coordinates begin -->
 <div class="row" ng-if="currentStage.captureCoordinates && currentEvent.eventDate">
     <div class="col-md-6">

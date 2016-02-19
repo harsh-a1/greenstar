@@ -30,8 +30,8 @@ package org.hisp.dhis.webapi.controller;
 
 import com.google.common.collect.Lists;
 import org.hisp.dhis.render.RenderService;
-import org.hisp.dhis.dxf2.schema.SchemaValidator;
-import org.hisp.dhis.validation.ValidationViolation;
+import org.hisp.dhis.schema.validation.SchemaValidator;
+import org.hisp.dhis.schema.validation.ValidationViolation;
 import org.hisp.dhis.dxf2.webmessage.WebMessage;
 import org.hisp.dhis.fieldfilter.FieldFilterService;
 import org.hisp.dhis.node.NodeUtils;

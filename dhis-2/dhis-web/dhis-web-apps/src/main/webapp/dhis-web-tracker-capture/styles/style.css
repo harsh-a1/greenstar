@@ -248,10 +248,13 @@ textarea {
     font-weight: bold;
 }
 
-.event-container-item{
-    align-self: center;
-    margin: auto;
-    text-align: center;
+.event-container-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: inherit;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .event-container-footer{
@@ -1411,8 +1414,6 @@ input, button, select, textarea {
 .event-table-custom > tbody > tr > td .statuscol {
     padding-right: 4px;
 }
-
-
 
 .badge.event-table-options-badge {
     padding-top: 0.5;

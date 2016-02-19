@@ -40,7 +40,7 @@ import org.hisp.dhis.common.IdScheme;
 import org.hisp.dhis.common.IdentifiableObjectManager;
 import org.hisp.dhis.common.IdentifiableObjectUtils;
 import org.hisp.dhis.common.IdentifiableProperty;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.dxf2.common.ImportOptions;
 import org.hisp.dhis.dxf2.metadata.ImportService;
 import org.hisp.dhis.dxf2.metadata.Metadata;
@@ -290,7 +290,7 @@ public class DefaultGmlImportService
         String coordinates = target.getCoordinates();
         FeatureType featureType = target.getFeatureType();
 
-        target.mergeWith( source, MergeStrategy.MERGE );
+        target.mergeWith( source, MergeMode.MERGE );
 
         target.setCoordinates( coordinates );
         target.setFeatureType( featureType );

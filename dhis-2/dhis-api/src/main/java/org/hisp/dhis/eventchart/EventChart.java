@@ -43,7 +43,7 @@ import org.hisp.dhis.common.DimensionalObjectUtils;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.EventAnalyticalObject;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
@@ -402,15 +402,15 @@ public class EventChart
     // -------------------------------------------------------------------------
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             EventChart chart = (EventChart) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 dataElementValueDimension = chart.getDataElementValueDimension();
                 attributeValueDimension = chart.getAttributeValueDimension();
@@ -420,7 +420,7 @@ public class EventChart
                 endDate = chart.getEndDate();
                 outputType = chart.getOutputType();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 dataElementValueDimension = chart.getDataElementValueDimension() == null ? dataElementValueDimension : chart.getDataElementValueDimension();
                 attributeValueDimension = chart.getAttributeValueDimension() == null ? attributeValueDimension : chart.getAttributeValueDimension();

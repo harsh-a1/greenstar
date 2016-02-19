@@ -64,7 +64,7 @@
                         {{currentStage.excecutionDateLabel}}
                     </th>
                     <th class="" ng-repeat="prStDe in currentStage.programStageDataElements">
-                        {{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}
+                        {{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}
                         <span ng-if="prStDe.compulsory" class="required">*</span>
                         <a href ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}" ng-init="showHelpText[prStDe.dataElement.id] = false;" ng-click="showHelpText[prStDe.dataElement.id] = !showHelpText[prStDe.dataElement.id]">
                             <span class="glyphicon glyphicon-info-sign" ></span>
@@ -114,15 +114,15 @@
                                         <ui-select  ng-model="eventRow[prStDe.dataElement.id]"
                                                     theme="select2"
                                                     ng-dblclick="$event.stopPropagation();"
-                                                    title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                                    title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                                     ng-required={{prStDe.compulsory}}
                                                     ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                                     name="{{eventRow.event}}{{prStDe.dataElement.id}}"
                                                     on-select="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
                                                     style="width:100%;">
-                                            <ui-select-match allow-clear="true" ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)' class="form-control-ui-select"  placeholder="{{'select_or_search' | translate}}">{{$select.selected.name  || $select.selected}}</ui-select-match>
-                                            <ui-select-choices  repeat="option.name as option in optionSets[prStDe.dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
-                                              <span ng-bind-html="option.name | highlight: $select.search"></span>
+                                            <ui-select-match allow-clear="true" ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)' class="form-control-ui-select"  placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                                            <ui-select-choices  repeat="option.displayName as option in optionSets[prStDe.dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
+                                              <span ng-bind-html="option.displayName | highlight: $select.search"></span>
                                             </ui-select-choices>
                                         </ui-select>
                                     </div>
@@ -134,7 +134,7 @@
                                             class="form-control"
                                             name="{{eventRow.event}}{{prStDe.dataElement.id}}"
                                             ng-required={{prStDe.compulsory}}
-                                            title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                            title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                             ng-dblclick="$event.stopPropagation();"
                                             ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                             ng-model="eventRow[prStDe.dataElement.id]"
@@ -148,12 +148,12 @@
                                                 ng-class='getInputNotifcationClass(prStDe.dataElement.id,true)'
                                                 name="{{eventRow.event}}{{prStDe.dataElement.id}}"
                                                 ng-required={{prStDe.compulsory}}
-                                                title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                                title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                                 ng-dblclick="$event.stopPropagation();"
                                                 ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                                 ng-model="eventRow[prStDe.dataElement.id]"
                                                 ng-change="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
-                                                value={{option.name}}> {{option.name}}
+                                                value={{option.displayName}}> {{option.displayName}}
                                         </label><br>
                                     </span>
                                 </div>
@@ -168,7 +168,7 @@
                                            d2-number-validator
                                            ng-required={{prStDe.compulsory}}
                                            ng-dblclick="$event.stopPropagation();"
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                            ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
                                            name="{{eventRow.event}}{{prStDe.dataElement.id}}"/>
@@ -181,7 +181,7 @@
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            d2-number-validator
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-dblclick="$event.stopPropagation();"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed"
                                            ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -195,7 +195,7 @@
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            d2-number-validator
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-dblclick="$event.stopPropagation();"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed"
                                            ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -209,7 +209,7 @@
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            d2-number-validator
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-dblclick="$event.stopPropagation();"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed"
                                            ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -223,7 +223,7 @@
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            d2-number-validator
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-dblclick="$event.stopPropagation();"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed"
                                            ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -235,7 +235,7 @@
                                             class="form-control"
                                             ng-model="eventRow[prStDe.dataElement.id]"
                                             ng-required={{prStDe.compulsory}}
-                                            title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                            title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                             ng-dblclick="$event.stopPropagation();"
                                             ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                             ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -248,7 +248,7 @@
                                             class="form-control"
                                             ng-model="eventRow[prStDe.dataElement.id]"
                                             ng-required={{prStDe.compulsory}}
-                                            title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                            title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                             ng-dblclick="$event.stopPropagation();"
                                             ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                             ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -257,7 +257,7 @@
                                 <div ng-switch-when="BOOLEAN">
                                     <d2-radio-button
                                         ng-dblclick="$event.stopPropagation();"
-                                        title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                        title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                         dh-required="prStDe.compulsory"
                                         dh-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][de.dataElement.id] === true"
                                         dh-value="eventRow[prStDe.dataElement.id]"
@@ -275,7 +275,7 @@
                                            ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-dblclick="$event.stopPropagation();"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                            blur-or-change="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -287,7 +287,7 @@
                                            ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-dblclick="$event.stopPropagation();"
                                            ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                            ng-change="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -299,7 +299,7 @@
                                         ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
                                         ng-model="eventRow[prStDe.dataElement.id]"
                                         ng-required={{prStDe.compulsory}}
-                                        title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                        title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                         ng-dblclick="$event.stopPropagation();"
                                         ng-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][prStDe.dataElement.id] "
                                         ng-blur="saveDatavalue(prStDe, $eval('eventRowForm' + eventRow.event + '.' + eventRow.event + prStDe.dataElement.id))"
@@ -320,7 +320,7 @@
                                 <div ng-switch-when="BOOLEAN">
                                     <d2-radio-button
                                         dh-required="prStDe.compulsory"
-                                        title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                        title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                         dh-disabled="selectedEnrollment.status !== 'ACTIVE' || eventRow.editingNotAllowed || assignedFields[eventRow.event][de.dataElement.id] === true"
                                         dh-value="eventRow[prStDe.dataElement.id]"
                                         dh-name="{{eventRow.event}}{{prStDe.dataElement.id}}"
@@ -332,19 +332,19 @@
                                            class="form-control"
                                            ng-model="eventRow[prStDe.dataElement.id]"
                                            ng-required={{prStDe.compulsory}}
-                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}"
+                                           title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}"
                                            ng-disabled="true"
                                            name="foo"/>
                                 </div>
                                 <div ng-switch-when="MULTI_SELECT_GROUP">
                                     <ul>
-                                        <li ng-repeat='event in eventRow[prStDe.dataElement.id].selections' title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}">
+                                        <li ng-repeat='event in eventRow[prStDe.dataElement.id].selections' title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}">
                                             {{event.formName ? event.formName : event.name}}
                                         </li>
                                     </ul>
                                 </div>
                                 <div ng-switch-default>
-                                    <span title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}">
+                                    <span title="{{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}">
                                         {{eventRow[prStDe.dataElement.id]}}
                                     </span>
                                 </div>
@@ -355,13 +355,13 @@
                              class="icon-padding"
                              ng-click="$event.stopPropagation();"
                              ng-dblclick="$event.stopPropagation();">
-                                <span ng-click="showCompleteErrorMessageInModal(errorMessages[eventRow.event][prStDe.dataElement.id], prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name)"
+                                <span ng-click="showCompleteErrorMessageInModal(errorMessages[eventRow.event][prStDe.dataElement.id], prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName)"
                                       ng-show="errorMessages[eventRow.event][prStDe.dataElement.id]">
                                         <i class="fa fa-exclamation-triangle error-text"
                                            tooltip="{{errorMessages[eventRow.event][prStDe.dataElement.id]}}"
                                            tooltip-placement="bottom"></i>
                                 </span>
-                                <span ng-click="showCompleteErrorMessageInModal(warningMessages[eventRow.event][prStDe.dataElement.id], prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name, true)"
+                                <span ng-click="showCompleteErrorMessageInModal(warningMessages[eventRow.event][prStDe.dataElement.id], prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName, true)"
                                       ng-show="warningMessages[eventRow.event][prStDe.dataElement.id]">
                                         <i class="fa fa-exclamation-triangle warning-text"
                                            tooltip="{{warningMessages[eventRow.event][prStDe.dataElement.id]}}"

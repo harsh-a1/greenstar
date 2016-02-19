@@ -106,19 +106,14 @@ public class DefaultProgramSchedulingManager implements ProgramSchedulingManager
     }
     
     @Override
-    public void executeTasks()
+    public void executeTasks() 
     {
-        Map<String, String> keyCronMap = getScheduledTasks();
-        
-        for ( String key : keyCronMap.keySet() )
-        {
-            Runnable task = tasks.get( key );
-            
-            if ( task != null )
-            {
-                scheduler.executeTask( task );
-            }
-        }
+          Runnable task = tasks.get( "sendMessageScheduledNow" );
+          
+          if ( task != null )
+          {
+              scheduler.executeTask( task );
+          }
     }
     
     @Override

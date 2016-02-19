@@ -40,7 +40,7 @@ import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DataDimensionType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
@@ -140,20 +140,20 @@ public class CategoryOptionGroup
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             CategoryOptionGroup categoryOptionGroup = (CategoryOptionGroup) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 groupSet = categoryOptionGroup.getGroupSet();
                 dataDimensionType = categoryOptionGroup.getDataDimensionType();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 groupSet = categoryOptionGroup.getGroupSet() == null ? groupSet : categoryOptionGroup.getGroupSet();
                 dataDimensionType = categoryOptionGroup.getDataDimensionType() == null ? dataDimensionType : categoryOptionGroup.getDataDimensionType();

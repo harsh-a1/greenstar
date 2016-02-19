@@ -28,17 +28,16 @@ package org.hisp.dhis.legend;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.hisp.dhis.common.BaseIdentifiableObject;
-import org.hisp.dhis.common.DxfNamespaces;
-import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
-import org.hisp.dhis.common.view.DetailedView;
-import org.hisp.dhis.common.view.ExportView;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DxfNamespaces;
+import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.common.view.DetailedView;
+import org.hisp.dhis.common.view.ExportView;
 
 /**
  * @author Jan Henrik Overland
@@ -52,7 +51,7 @@ public class Legend
     private Double endValue;
 
     private String color;
-    
+
     private String image;
 
     public Legend()
@@ -115,7 +114,7 @@ public class Legend
     public void setColor( String color )
     {
         this.color = color;
-    }   
+    }
 
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class } )
@@ -131,22 +130,22 @@ public class Legend
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             Legend legend = (Legend) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 startValue = legend.getStartValue();
                 endValue = legend.getEndValue();
                 color = legend.getColor();
                 image = legend.getImage();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 startValue = legend.getStartValue() == null ? startValue : legend.getStartValue();
                 endValue = legend.getEndValue() == null ? endValue : legend.getEndValue();

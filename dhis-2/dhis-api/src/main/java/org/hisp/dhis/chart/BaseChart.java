@@ -43,7 +43,7 @@ import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.Grid;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObjectUtils;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
@@ -493,9 +493,9 @@ public abstract class BaseChart
     // -------------------------------------------------------------------------
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -508,7 +508,7 @@ public abstract class BaseChart
             showData = chart.isShowData();
             hideEmptyRows = chart.isHideEmptyRows();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 domainAxisLabel = chart.getDomainAxisLabel();
                 rangeAxisLabel = chart.getRangeAxisLabel();
@@ -523,7 +523,7 @@ public abstract class BaseChart
                 rangeAxisSteps = chart.getRangeAxisSteps();
                 rangeAxisDecimals = chart.getRangeAxisDecimals();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 domainAxisLabel = chart.getDomainAxisLabel() == null ? domainAxisLabel : chart.getDomainAxisLabel();
                 rangeAxisLabel = chart.getRangeAxisLabel() == null ? rangeAxisLabel : chart.getRangeAxisLabel();

@@ -400,7 +400,7 @@ public class HibernateDataApprovalStore
             final boolean approvedAbove = rowSet.getBoolean( 5 );
 
             final int level = highestApproved == null ? 0 : highestApproved.intValue();
-            final boolean accepted = ( highestApproved == level );
+            final boolean accepted = ( highestApproved != 0 && highestApproved == level );
 
             DataApprovalLevel approvedLevel = ( level == 0 ? null : levelMap.get( level ) ); // null if not approved
             DataApprovalLevel actionLevel = ( approvedLevel == null ? lowestApprovalLevelForOrgUnit : approvedLevel );

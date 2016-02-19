@@ -9,7 +9,6 @@ trackerCapture.controller('EnrollmentController',
                 DateUtils,
                 SessionStorageService,
                 CurrentSelection,
-                OrgUnitService,
                 EnrollmentService,
                 $route,
                 DialogService,
@@ -43,6 +42,7 @@ trackerCapture.controller('EnrollmentController',
         $scope.enrollments = selections.enrollments;
         $scope.programExists = args.programExists;
         $scope.programNames = selections.prNames;
+
         $scope.programStageNames = selections.prStNames;
         $scope.attributesById = CurrentSelection.getAttributesById();
         $scope.activeEnrollments =  [];
@@ -59,16 +59,6 @@ trackerCapture.controller('EnrollmentController',
             });
             
             angular.forEach($scope.enrollments, function(enrollment){
-                if(enrollment.orgUnit !== $scope.selectedOrgUnit.id) {
-                    OrgUnitService.get(enrollment.orgUnit).then(function(ou){
-                        if(ou){
-                            enrollment.orgUnitName = $scope.selectedOrgUnit.name;
-                        }                                                       
-                    });
-                }
-                else{
-                    enrollment.orgUnitName = $scope.selectedOrgUnit.name;
-                }
                 if(enrollment.program === $scope.selectedProgram.id ){
                     if(enrollment.status === 'ACTIVE'){
                         selectedEnrollment = enrollment;
@@ -119,7 +109,7 @@ trackerCapture.controller('EnrollmentController',
             $scope.showEnrollmentHistoryDiv = false;
             
             //load new enrollment details
-            $scope.selectedEnrollment = {orgUnitName: $scope.selectedOrgUnit.name};            
+            $scope.selectedEnrollment = {orgUnitName: $scope.selectedOrgUnit.displayName};            
             $scope.loadEnrollmentDetails($scope.selectedEnrollment);
             
             $timeout(function() { 

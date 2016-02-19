@@ -2,7 +2,7 @@
 <table class="dhis2-list-table-striped dhis2-table-hover">
     <tr ng-repeat="attribute in attributes | filter: {attribute: 'true'} " ng-if="!hiddenFields[attribute.id] && ((editingDisabled  && attribute.show) || !editingDisabled)">
         <td>
-            <span ng-bind="attribute.name"></span><span ng-if="attribute.mandatory || attribute.unique" class="required">*</span>
+            <span ng-bind="attribute.displayName"></span><span ng-if="attribute.mandatory || attribute.unique" class="required">*</span>
             <a ng-if="attribute.description" Title="{{attribute.description}}" ng-click="showHelpText(attribute.id)">
                 <span class="glyphicon glyphicon-info-sign" ></span>
                 <span ng-show="helpTexts[attribute.id]" ><br>{{attribute.description}}</span>
@@ -22,9 +22,9 @@
                                 ng-disabled="editingDisabled" 
                                 on-select="teiValueUpdated(selectedTei, attribute.id)"
                                  ng-style="{'width': '100%'}">
-                        <ui-select-match allow-clear="true"  class="form-control-ui-select"  placeholder="{{'select_or_search' | translate}}">{{$select.selected.name  || $select.selected}}</ui-select-match>
-                        <ui-select-choices  repeat="option.name as option in optionSets[attributesById[attribute.id].optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
-                          <span ng-bind-html="option.name | highlight: $select.search"></span>
+                        <ui-select-match allow-clear="true"  class="form-control-ui-select"  placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                        <ui-select-choices  repeat="option.displayName as option in optionSets[attributesById[attribute.id].optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
+                          <span ng-bind-html="option.displayName | highlight: $select.search"></span>
                         </ui-select-choices>
                     </ui-select>
                 </span>
@@ -173,10 +173,10 @@
                                style="width:75%;"
                                ng-required="attribute.mandatory || attribute.unique"/>
                         <span class="hideInPrint">
-                            <a href ng-class="{true: 'disable-clicks', false: ''} [editingDisabled]" ng-click="getTrackerAssociate(attribute, selectedTei[attribute.id])" title="{{'add'| translate}} {{attribute.name}}">
+                            <a href ng-class="{true: 'disable-clicks', false: ''} [editingDisabled]" ng-click="getTrackerAssociate(attribute, selectedTei[attribute.id])" title="{{'add'| translate}} {{attribute.displayName}}">
                                 <i class="fa fa-external-link fa-2x vertical-center"></i>
                             </a>
-                            <a href ng-if="selectedTei[attribute.id]" ng-class="{true: 'disable-clicks', false: ''} [editingDisabled]" ng-click="selectedTei[attribute.id] = null" title="{{'add'| translate}} {{attribute.name}}">
+                            <a href ng-if="selectedTei[attribute.id]" ng-class="{true: 'disable-clicks', false: ''} [editingDisabled]" ng-click="selectedTei[attribute.id] = null" title="{{'add'| translate}} {{attribute.displayName}}">
                                 <i class="fa fa-trash-o fa-2x vertical-center"></i>
                             </a>
                         </span>
@@ -209,7 +209,7 @@
             </ng-form>            
         </td>
         <td class="hideInPrint audit-icon-column" align="center" ng-if="selectedTeiId">
-            <d2-audit dataelement-id="{{attribute.id}}" dataelement-name="{{attribute.name}}" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}}></d2-audit>
+            <d2-audit dataelement-id="{{attribute.id}}" dataelement-name="{{attribute.displayName}}" data-type="attribute" selected-tei-id={{selectedTei.trackedEntityInstance}}></d2-audit>
         </td>
     </tr>           
 </table>

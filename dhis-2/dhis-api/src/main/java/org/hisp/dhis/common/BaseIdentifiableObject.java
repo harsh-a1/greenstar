@@ -573,11 +573,11 @@ public class BaseIdentifiableObject
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
         Validate.notNull( other );
 
-        if ( strategy.isReplace() )
+        if ( mergeMode.isReplace() )
         {
             uid = other.getUid();
             name = other.getName();
@@ -586,7 +586,7 @@ public class BaseIdentifiableObject
             created = other.getCreated();
             user = other.getUser();
         }
-        else if ( strategy.isMerge() )
+        else if ( mergeMode.isMerge() )
         {
             uid = other.getUid() == null ? uid : other.getUid();
             name = other.getName() == null ? name : other.getName();

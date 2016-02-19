@@ -15,8 +15,8 @@ trackerCapture.controller('SelectedInfoController',
         $scope.selectedOrgUnit = SessionStorageService.get('SELECTED_OU');
         $scope.selections = [];
         
-        $scope.selections.push({title: 'registering_unit', value: $scope.selectedOrgUnit ? $scope.selectedOrgUnit.name : 'not_selected'});
-        $scope.selections.push({title: 'program', value: $scope.selectedProgram ? $scope.selectedProgram.name : 'not_selected'});               
+        $scope.selections.push({title: 'registering_unit', value: $scope.selectedOrgUnit ? $scope.selectedOrgUnit.displayName : 'not_selected'});
+        $scope.selections.push({title: 'program', value: $scope.selectedProgram ? $scope.selectedProgram.displayName : 'not_selected'});               
         
     });     
 });

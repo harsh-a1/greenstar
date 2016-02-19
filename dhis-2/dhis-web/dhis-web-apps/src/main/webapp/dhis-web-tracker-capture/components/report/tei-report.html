@@ -21,7 +21,7 @@
                 <table class="table table-striped dhis2-table-hover">
                     <tr ng-click="showProgramReportDetails(pr)" ng-repeat="pr in programs" ng-if="report[pr.id].enrollments" title="{{'details'| translate}}">                   
                         <td>
-                            {{pr.name}}                        
+                            {{pr.displayName}}                        
                         </td>
                     </tr>
                 </table>

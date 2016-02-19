@@ -5,6 +5,7 @@ trackerCapture.controller('EventCreationController',
         function ($scope,
                 $modalInstance,
                 $timeout,
+                $translate,
                 DateUtils,
                 DHIS2EventFactory,
                 OrgUnitFactory,
@@ -22,7 +23,8 @@ trackerCapture.controller('EventCreationController',
                 autoCreate,
                 EventUtils,
                 events,
-                suggestedStage) {
+                suggestedStage,
+                selectedCategories) {
     $scope.stages = stages;
     $scope.allStages = allStages;
     $scope.events = events;
@@ -34,8 +36,11 @@ trackerCapture.controller('EventCreationController',
     $scope.model = {selectedStage: stage, dueDateInvalid: false, eventDateInvalid: false};
     $scope.stageSpecifiedOnModalOpen = angular.isObject(stage) ? true : false;
     $scope.suggestedStage = suggestedStage;
-    
-    var orgPath = [];    
+    $scope.selectedProgram = program;
+    $scope.selectedCategories = selectedCategories;
+    $scope.pleaseSelectLabel = $translate.instant('please_select');
+
+    var orgPath = [];
     var dummyEvent = {};
     
     function prepareEvent(){
@@ -169,7 +174,25 @@ trackerCapture.controller('EventCreationController',
         }
     });
 
+    $scope.getCategoryOptions = function(){
+        $scope.eventFetched = false;
+        $scope.optionsReady = false;
+        $scope.selectedOptions = [];
+        for (var i = 0; i < $scope.selectedCategories.length; i++) {
+            if ($scope.selectedCategories[i].selectedOption && $scope.selectedCategories[i].selectedOption.id) {
+                $scope.optionsReady = true;
+                $scope.selectedOptions.push($scope.selectedCategories[i].selectedOption.id);
+            }
+            else {
+                $scope.optionsReady = false;
+                break;
+            }
+        }
+    };
+
     $scope.save = function () {
+
+        $scope.getCategoryOptions();
         //check for form validity
         if ($scope.model.dueDateInvalid || $scope.model.eventDateInvalid) {
             return false;
@@ -203,6 +226,20 @@ trackerCapture.controller('EventCreationController',
         };
 
         newEvent.status = newEvent.eventDate ? 'ACTIVE' : 'SCHEDULE';
+
+        /*for saving category combo*/
+        if (!$scope.selectedProgram.categoryCombo.isDefault) {
+            if ($scope.selectedOptions.length !== $scope.selectedCategories.length) {
+                var dialogOptions = {
+                    headerText: 'error',
+                    bodyText: 'fill_all_category_options'
+                };
+                DialogService.showDialog({}, dialogOptions);
+                return;
+            }
+            newEvent.attributeCategoryOptions = $scope.selectedOptions.join(';');
+        }
+        /*for saving category combo*/
 
         newEvents.events.push(newEvent);
         DHIS2EventFactory.create(newEvents).then(function (response) {

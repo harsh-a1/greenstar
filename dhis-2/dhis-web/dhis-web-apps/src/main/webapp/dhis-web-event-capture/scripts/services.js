@@ -66,7 +66,7 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
         getCode: function(options, key){
             if(options){
                 for(var i=0; i<options.length; i++){
-                    if( key === options[i].name){
+                    if( key === options[i].displayName){
                         return options[i].code;
                     }
                 }
@@ -77,8 +77,7 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
             if(options){
                 for(var i=0; i<options.length; i++){                    
                     if( key === options[i].code){
-                        return options[i].name;
-                        //return options[i];
+                        return options[i].displayName;
                     }
                 }
             }            
@@ -348,13 +347,13 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
                         if(pi.displayInForm){
                             var newAction = {
                                     id:pi.id,
-                                    content:pi.displayDescription ? pi.displayDescription : pi.name,
+                                    content:pi.displayDescription ? pi.displayDescription : pi.displayName,
                                     data:pi.expression,
                                     programRuleActionType:'DISPLAYKEYVALUEPAIR',
                                     location:'indicators'
                                 };
                             var newRule = {
-                                    name:pi.name,
+                                    displayName:pi.displayName,
                                     id: pi.id,
                                     shortname:pi.shortname,
                                     code:pi.code,
@@ -383,7 +382,7 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
                                 if(variableNameParts.length === 2) {
                                     //this is a programstage and dataelement specification. translate to program variable:
                                     newVariableObject = {
-                                        name:variableName,
+                                        displayName:variableName,
                                         programRuleVariableSourceType:'DATAELEMENT_NEWEST_EVENT_PROGRAM_STAGE',
                                         dataElement:variableNameParts[1],
                                         programStage:variableNameParts[0],
@@ -394,7 +393,7 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
                                 {
                                     //This is an attribute - let us translate to program variable:
                                     newVariableObject = {
-                                        name:variableName,
+                                        displayName:variableName,
                                         programRuleVariableSourceType:'TEI_ATTRIBUTE',
                                         trackedEntityAttribute:variableNameParts[0],
                                         program:programUid
@@ -425,12 +424,12 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
                                 angular.forEach(variableObjectsCurrentExpression, function(variableCurrentRule) {
                                    if(valueCountText) {
                                        //This is not the first value in the value count part of the expression. 
-                                       valueCountText +=  ' + d2:count(\'' + variableCurrentRule.name + '\')';
+                                       valueCountText +=  ' + d2:count(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                    else
                                    {
                                        //This is the first part value in the value count expression:
-                                       valueCountText = '(d2:count(\'' + variableCurrentRule.name + '\')';
+                                       valueCountText = '(d2:count(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                 });
                                 //To finish the value count expression we need to close the paranthesis:
@@ -445,12 +444,12 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
                                 angular.forEach(variableObjectsCurrentExpression, function(variableCurrentRule) {
                                    if(zeroPosValueCountText) {
                                        //This is not the first value in the value count part of the expression. 
-                                       zeroPosValueCountText +=  '+ d2:countifzeropos(\'' + variableCurrentRule.name + '\')';
+                                       zeroPosValueCountText +=  '+ d2:countifzeropos(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                    else
                                    {
                                        //This is the first part value in the value count expression:
-                                       zeroPosValueCountText = '(d2:countifzeropos(\'' + variableCurrentRule.name + '\')';
+                                       zeroPosValueCountText = '(d2:countifzeropos(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                 });
                                 //To finish the value count expression we need to close the paranthesis:

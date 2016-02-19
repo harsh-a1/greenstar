@@ -534,7 +534,7 @@ dhis2.db.renderDashboard = function( id )
 
     $( "#dashboard-" + dhis2.db.current() ).addClass( "currentDashboard" );
 
-    $.getJSON( "../api/dashboards/" + id + "?fields=:all,dashboardItems[:all,reports[id,displayName],chart[id,displayName],map[id,displayName],reportTable[id,displayName]]&" + dhis2.util.cacheBust(), function( data )
+    $.getJSON( "../api/dashboards/" + id + "?fields=:all,dashboardItems[:all,reports[id,displayName],chart[id,displayName],map[id,displayName],reportTable[id,displayName],resources[id,displayName]]&" + dhis2.util.cacheBust(), function( data )
     {
 		$d = $( "#contentList" ).empty();
 

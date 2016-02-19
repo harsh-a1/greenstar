@@ -116,9 +116,6 @@
       <element type="string" column="dimension" />
     </list>
     
-    <many-to-one name="program" class="org.hisp.dhis.program.Program" column="programid"
-      foreign-key="fk_reporttable_programid" />
-
     <component name="reportParams">
       <property name="paramReportingMonth" />
       <property name="paramGrandParentOrganisationUnit" />

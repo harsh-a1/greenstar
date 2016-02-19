@@ -35,7 +35,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
 import org.hisp.dhis.schema.PropertyType;
@@ -194,9 +194,9 @@ public class MapLayer
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -205,7 +205,7 @@ public class MapLayer
             strokeWidth = mapLayer.getStrokeWidth();
             fillOpacity = mapLayer.getFillOpacity();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 type = mapLayer.getType();
                 url = mapLayer.getUrl();
@@ -214,7 +214,7 @@ public class MapLayer
                 fillColor = mapLayer.getFillColor();
                 strokeColor = mapLayer.getStrokeColor();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 type = mapLayer.getType() == null ? type : mapLayer.getType();
                 url = mapLayer.getUrl() == null ? url : mapLayer.getUrl();

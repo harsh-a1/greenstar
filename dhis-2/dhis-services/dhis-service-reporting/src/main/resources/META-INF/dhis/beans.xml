@@ -179,6 +179,8 @@
         <entry key="analyticsLast3YearsTask" value-ref="analyticsLast3YearsTask" />
         <entry key="monitoringLastDayTask" value-ref="monitoringLastDayTask" />
         <entry key="dataSynchTask" value-ref="dataSynchTask" />
+        <entry key="smsSchedulerTask" value-ref="scheduleMessageTask" />    
+        <entry key="sendScheduledMessageTask" value-ref="sendMessageScheduledTask" />  
       </map>
     </property>
   </bean>

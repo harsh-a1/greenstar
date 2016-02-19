@@ -34,7 +34,7 @@ import org.hisp.dhis.attribute.exception.NonUniqueAttributeValueException;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObjectManager;
 import org.hisp.dhis.i18n.I18nService;
-import org.hisp.dhis.validation.ValidationViolation;
+import org.hisp.dhis.schema.validation.ValidationViolation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;

@@ -75,23 +75,25 @@ public class DataEntryForm
 
     public DataEntryForm()
     {
+        this.setAutoFields();
     }
 
     public DataEntryForm( String name )
     {
-        this(name,null);
+        this();
+        this.name = name;
     }
 
     public DataEntryForm( String name, String htmlCode )
     {
-        this(name,null,htmlCode);
+        this( name );
+        this.htmlCode = htmlCode;
     }
 
     public DataEntryForm( String name, DisplayDensity style, String htmlCode )
     {
-        this.name = name;
+        this( name, htmlCode );
         this.style = style;
-        this.htmlCode = htmlCode;
     }
 
     // -------------------------------------------------------------------------

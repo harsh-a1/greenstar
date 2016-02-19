@@ -239,7 +239,7 @@ trackerCapture.controller('DataEntryController',
                     if(effect.dataElement) {                           
                         var message = effect.content;
                         $scope.errorMessages[event][effect.dataElement.id] = message;
-                        $scope.errorMessages[event].push($translate.instant($scope.prStDes[effect.dataElement.id].dataElement.name) + ": " + message);
+                        $scope.errorMessages[event].push($translate.instant($scope.prStDes[effect.dataElement.id].dataElement.displayName) + ": " + message);
                     }
                     else
                     {
@@ -254,7 +254,7 @@ trackerCapture.controller('DataEntryController',
                     if(effect.dataElement) {
                         var message = effect.content;
                         $scope.warningMessages[event][effect.dataElement.id] = message;
-                        $scope.warningMessages[event].push($translate.instant($scope.prStDes[effect.dataElement.id].dataElement.name) + ": " + message);
+                        $scope.warningMessages[event].push($translate.instant($scope.prStDes[effect.dataElement.id].dataElement.displayName) + ": " + message);
                     } else {
                         $scope.warningMessages[event].push(message);
                     }
@@ -669,7 +669,7 @@ trackerCapture.controller('DataEntryController',
                     }
                     var eventStage = $scope.stagesById[dhis2Event.programStage];
                     if (angular.isObject(eventStage)) {
-                        dhis2Event.name = eventStage.name;
+                        dhis2Event.name = eventStage.displayName;
                         dhis2Event.excecutionDateLabel = eventStage.excecutionDateLabel ? eventStage.excecutionDateLabel : $translate.instant('report_date');
                         dhis2Event.dueDate = DateUtils.formatFromApiToUser(dhis2Event.dueDate);
                         dhis2Event.sortingDate = dhis2Event.dueDate;
@@ -1005,7 +1005,7 @@ trackerCapture.controller('DataEntryController',
             }
         }
         var autoCreate = stage && stage.displayEventsInTable ? stage.displayEventsInTable : false;
-        EventCreationService.showModal($scope.eventsByStage, stage, availableStages, $scope.programStages, $scope.selectedEntity, $scope.selectedProgram, $scope.selectedOrgUnit, $scope.selectedEnrollment, autoCreate, eventCreationAction, allApplicableEvents,suggestedStage)
+        EventCreationService.showModal($scope.eventsByStage, stage, availableStages, $scope.programStages, $scope.selectedEntity, $scope.selectedProgram, $scope.selectedOrgUnit, $scope.selectedEnrollment, autoCreate, eventCreationAction, allApplicableEvents,suggestedStage, $scope.selectedCategories)
                 .then(function (eventContainer) {
                     if(angular.isDefined(eventContainer)){                
                         var ev = eventContainer.ev;

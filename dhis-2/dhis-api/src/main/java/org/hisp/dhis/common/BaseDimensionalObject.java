@@ -330,9 +330,9 @@ public class BaseDimensionalObject
     //--------------------------------------------------------------------------
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -340,7 +340,7 @@ public class BaseDimensionalObject
 
             dataDimension = dimensionalObject.isDataDimension();
             
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 dimensionType = dimensionalObject.getDimensionType();
                 dimensionName = dimensionalObject.getDimensionName();
@@ -348,7 +348,7 @@ public class BaseDimensionalObject
                 aggregationType = dimensionalObject.getAggregationType();
                 filter = dimensionalObject.getFilter();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 dimensionType = dimensionalObject.getDimensionType() == null ? dimensionType : dimensionalObject.getDimensionType();
                 dimensionName = dimensionalObject.getDimensionName() == null ? dimensionName : dimensionalObject.getDimensionName();

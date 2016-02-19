@@ -56,6 +56,7 @@ import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
 import org.hisp.dhis.dataelement.DataElementGroup;
 import org.hisp.dhis.dataelement.DataElementGroupSet;
 import org.hisp.dhis.dataelement.DataElementOperand;
+import org.hisp.dhis.dataentryform.DataEntryForm;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.dataset.Section;
 import org.hisp.dhis.document.Document;
@@ -208,6 +209,8 @@ public class Metadata
     private List<LegendSet> legendSets = new ArrayList<>();
 
     private List<MapLayer> mapLayers = new ArrayList<>();
+
+    private List<DataEntryForm> dataEntryForms = new ArrayList<>();
 
     private List<Section> sections = new ArrayList<>();
 
@@ -661,6 +664,19 @@ public class Metadata
     public void setOrganisationUnitLevels( List<OrganisationUnitLevel> organisationUnitLevels )
     {
         this.organisationUnitLevels = organisationUnitLevels;
+    }
+
+    @JsonProperty
+    @JacksonXmlElementWrapper( localName = "dataEntryForms", namespace = DxfNamespaces.DXF_2_0 )
+    @JacksonXmlProperty( localName = "dataEntryForm", namespace = DxfNamespaces.DXF_2_0 )
+    public List<DataEntryForm> getDataEntryForms()
+    {
+        return dataEntryForms;
+    }
+
+    public void setDataEntryForms( List<DataEntryForm> dataEntryForms )
+    {
+        this.dataEntryForms = dataEntryForms;
     }
 
     @JsonProperty

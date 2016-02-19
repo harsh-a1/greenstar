@@ -117,7 +117,9 @@ public class AdvanceHttpPostGateWay
 
                 HttpURLConnection httpConnection = (HttpURLConnection) conn;
 
-                if ( httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK )
+                if ( httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK
+                    && httpConnection.getResponseCode() != HttpURLConnection.HTTP_ACCEPTED
+                    && httpConnection.getResponseCode() != HttpURLConnection.HTTP_CREATED )
                 {
                     log.warn( "Couldn't send message, got response " + response + " " + getGatewayId() );
                     return 0;

@@ -28,9 +28,13 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.google.common.base.MoreObjects;
 import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.preheat.InvalidObject;
 import org.hisp.dhis.preheat.PreheatValidation;
+import org.hisp.dhis.schema.validation.ValidationViolation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +46,15 @@ public class ObjectBundleValidation
 {
     private Map<Class<? extends IdentifiableObject>, List<PreheatValidation>> preheatValidations = new HashMap<>();
 
+    private Map<Class<? extends IdentifiableObject>, List<List<ValidationViolation>>> validationViolations = new HashMap<>();
+
+    private Map<Class<? extends IdentifiableObject>, List<InvalidObject>> invalidObjects = new HashMap<>();
+
     public ObjectBundleValidation()
     {
     }
 
-    public void addInvalidReferences( Class<? extends IdentifiableObject> klass, List<PreheatValidation> preheatValidations )
+    public void addPreheatValidations( Class<? extends IdentifiableObject> klass, List<PreheatValidation> preheatValidations )
     {
         this.preheatValidations.put( klass, preheatValidations );
     }
@@ -54,5 +62,38 @@ public class ObjectBundleValidation
     public Map<Class<? extends IdentifiableObject>, List<PreheatValidation>> getPreheatValidations()
     {
         return preheatValidations;
+    }
+
+    public void addValidationViolation( Class<? extends IdentifiableObject> klass, List<List<ValidationViolation>> validationViolations )
+    {
+        this.validationViolations.put( klass, validationViolations );
+    }
+
+    public Map<Class<? extends IdentifiableObject>, List<List<ValidationViolation>>> getValidationViolations()
+    {
+        return validationViolations;
+    }
+
+    public void addInvalidObject( Class<? extends IdentifiableObject> klass, InvalidObject invalidObject )
+    {
+        if ( !invalidObjects.containsKey( klass ) )
+        {
+            invalidObjects.put( klass, new ArrayList<>() );
+        }
+
+        invalidObjects.get( klass ).add( invalidObject );
+    }
+
+    public Map<Class<? extends IdentifiableObject>, List<InvalidObject>> getInvalidObjects()
+    {
+        return invalidObjects;
+    }
+
+    @Override
+    public String toString()
+    {
+        return MoreObjects.toStringHelper( this )
+            .add( "preheatValidations", preheatValidations )
+            .toString();
     }
 }

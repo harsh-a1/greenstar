@@ -31,6 +31,7 @@ package org.hisp.dhis.common;
 import org.hisp.dhis.attribute.Attribute;
 import org.hisp.dhis.attribute.AttributeValue;
 import org.hisp.dhis.common.NameableObject.NameableProperty;
+import org.hisp.dhis.user.User;
 
 import java.util.Collection;
 import java.util.Date;
@@ -47,11 +48,23 @@ public interface IdentifiableObjectManager
 
     void save( IdentifiableObject object );
 
+    void save( IdentifiableObject object, User user );
+
     void save( IdentifiableObject object, boolean clearSharing );
+
+    void save( IdentifiableObject object, User user, boolean clearSharing );
 
     void update( IdentifiableObject object );
 
-    void update( List<IdentifiableObject> object );
+    void update( IdentifiableObject object, User user );
+
+    void update( List<IdentifiableObject> objects );
+
+    void update( List<IdentifiableObject> objects, User user );
+
+    void delete( IdentifiableObject object );
+
+    void delete( IdentifiableObject object, User user );
 
     <T extends IdentifiableObject> T get( String uid );
 
@@ -111,8 +124,6 @@ public interface IdentifiableObjectManager
 
     <T extends IdentifiableObject> Date getLastUpdated( Class<T> clazz );
 
-    void delete( IdentifiableObject object );
-
     <T extends IdentifiableObject> Set<Integer> convertToId( Class<T> clazz, Collection<String> uids );
 
     <T extends IdentifiableObject> Map<String, T> getIdMap( Class<T> clazz, IdentifiableProperty property );
@@ -168,6 +179,8 @@ public interface IdentifiableObjectManager
     <T extends IdentifiableObject> boolean isAttributeValueUnique( Class<? extends IdentifiableObject> klass, T object, AttributeValue attributeValue );
 
     <T extends IdentifiableObject> boolean isAttributeValueUnique( Class<? extends IdentifiableObject> klass, T object, Attribute attribute, String value );
+
+    Map<Class<? extends IdentifiableObject>, IdentifiableObject> getDefaults();
 
     // -------------------------------------------------------------------------
     // NO ACL

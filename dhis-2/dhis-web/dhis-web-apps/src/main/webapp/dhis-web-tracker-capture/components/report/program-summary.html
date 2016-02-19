@@ -18,15 +18,15 @@
     </div>
     
     <!--- selected org unit begins -->
-    <input type="text" selected-org-unit ng-model="selectedOrgUnit.name" ng-hide=true>
+    <input type="text" selected-org-unit ng-model="selectedOrgUnit.displayName" ng-hide=true>
     <!--- selected org unit ends  -->
     
 </div>
 
-<div id="mainPage" class="bordered-div">
+<div id="mainPage" class="bordered-div page">
     <h2>{{'program_summary_report'| translate}}</h2>
     <form name="outerForm" novalidate>               
-        <div ng-include="'components/report/reportForm.html'"></div>
+        <div ng-include="'components/report/report-form.html'"></div>
     </form>    
     <img src="../images/ajax-loader-bar.gif" ng-if="!dataReady && reportStarted"/>
     <div ng-if="dataReady">
@@ -48,14 +48,14 @@
                     <tabset>                        
                         <tab ng-repeat="stage in programStages | orderBy: 'sortOrder'">
                             <tab-heading>
-                                <span class="bold">{{stage.name}}</span>
+                                <span class="bold">{{stage.displayName}}</span>
                             </tab-heading>
                             <div ng-if="stage.hasData">
                                 <table class="table table-bordered vertical-spacing">
                                     <thead>                        
                                         <tr>
                                             <th class="active">
-                                                {{selectedProgram.trackedEntity.name}}
+                                                {{selectedProgram.trackedEntity.displayName}}
                                             </th>
                                             <th class="active">
                                                 {{'event_date' | translate}}
@@ -64,7 +64,7 @@
                                                 {{'event_orgunit_name'| translate}}
                                             </th>
                                             <th class="active" ng-if="prStDe.displayInReports" ng-repeat="prStDe in stage.programStageDataElements">
-                                                {{prStDe.dataElement.name}}
+                                                {{prStDe.dataElement.displayName}}
                                             </th>                                        
                                         </tr>                        
                                     </thead>
@@ -73,7 +73,7 @@
                                             <td rowspan="{{(dhis2Events | filter: {programStage: stage.id, trackedEntityInstance: tei}).length}}" 
                                                 ng-if="$index === 0">
                                                 <span ng-repeat="gridColumn in gridColumns" ng-if="gridColumn.displayInListNoProgram">
-                                                    <span class="bold">{{gridColumn.name}}:</span> {{ev[gridColumn.id]}}<br>
+                                                    <span class="bold">{{gridColumn.displayName}}:</span> {{ev[gridColumn.id]}}<br>
                                                 </span>
                                             </td>
                                             <td>

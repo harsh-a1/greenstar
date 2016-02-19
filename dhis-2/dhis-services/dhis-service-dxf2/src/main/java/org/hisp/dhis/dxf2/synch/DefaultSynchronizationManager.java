@@ -146,8 +146,8 @@ public class DefaultSynchronizationManager
         {
             return new AvailabilityStatus( false, "Network is unreachable" );
         }
-
-        log.info( "Response: " + response + ", status code: " + sc );
+        
+        log.info( "Response status code: " + sc );
 
         if ( HttpStatus.FOUND.equals( sc ) )
         {

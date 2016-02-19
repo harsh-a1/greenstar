@@ -41,7 +41,7 @@ import org.hisp.dhis.common.DimensionalObject;
 import org.hisp.dhis.common.DimensionalObjectUtils;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
@@ -462,15 +462,15 @@ public class MapView
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             MapView mapView = (MapView) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 layer = mapView.getLayer();
                 method = mapView.getMethod();
@@ -490,7 +490,7 @@ public class MapView
                 labelFontStyle = mapView.getLabelFontStyle();
                 labelFontColor = mapView.getLabelFontColor();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 layer = mapView.getLayer() == null ? layer : mapView.getLayer();
                 method = mapView.getMethod() == null ? method : mapView.getMethod();

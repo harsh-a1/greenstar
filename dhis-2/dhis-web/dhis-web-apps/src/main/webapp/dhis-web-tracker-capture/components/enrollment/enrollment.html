@@ -141,7 +141,7 @@
                             <table class="table table-striped dhis2-table-hover table-bordered">
                                 <tr ng-repeat="activeEnrollment in activeEnrollments">
                                     <td ng-if="selectedProgram && selectedProgram.id !== activeEnrollment.program || !selectedProgram" title="{{'set_as_current'| translate}}" ng-click="changeProgram(activeEnrollment.program)">
-                                        {{programNames[activeEnrollment.program].name}}
+                                        {{programNames[activeEnrollment.program].displayName}}
                                     </td>
                                 </tr>
                             </table> 

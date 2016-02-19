@@ -30,7 +30,7 @@ package org.hisp.dhis.webapi.controller;
 
 import org.hisp.dhis.common.DimensionService;
 import org.hisp.dhis.common.Grid;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.cache.CacheStrategy;
 import org.hisp.dhis.dxf2.common.ImportOptions;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
@@ -124,7 +124,7 @@ public class ReportTableController
 
         mergeReportTable( newReportTable );
 
-        reportTable.mergeWith( newReportTable, MergeStrategy.MERGE_IF_NOT_NULL );
+        reportTable.mergeWith( newReportTable, MergeMode.MERGE_IF_NOT_NULL );
 
         reportTableService.updateReportTable( reportTable );
     }

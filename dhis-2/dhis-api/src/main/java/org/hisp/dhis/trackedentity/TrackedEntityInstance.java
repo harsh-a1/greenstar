@@ -37,7 +37,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
@@ -180,22 +180,22 @@ public class TrackedEntityInstance
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             TrackedEntityInstance trackedEntityInstance = (TrackedEntityInstance) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 organisationUnit = trackedEntityInstance.getOrganisationUnit();
                 inactive = trackedEntityInstance.isInactive();
                 trackedEntity = trackedEntityInstance.getTrackedEntity();
                 representative = trackedEntityInstance.getRepresentative();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 organisationUnit = trackedEntityInstance.getOrganisationUnit() == null ? organisationUnit : trackedEntityInstance.getOrganisationUnit();
                 inactive = trackedEntityInstance.isInactive() == null ? inactive : trackedEntityInstance.isInactive();

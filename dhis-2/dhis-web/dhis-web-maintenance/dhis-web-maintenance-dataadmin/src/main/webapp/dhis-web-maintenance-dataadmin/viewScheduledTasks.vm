@@ -67,6 +67,23 @@
 </select>
 </div>
 
+
+<!-- SMS -->
+
+<div class="settingHeader">$i18n.getString( "sms_scheduler")</div>
+
+<div class="settingLabel settingIndent">$i18n.getString( "sms_scheduler_strategy" )</div>
+
+<div class="settingLabel settingIndent tipText">$i18n.getString( "last_success" ): $!format.formatDateTime( $lastSmsSchedulerSuccess )</div>
+
+<div class="setting settingIndent">
+<select id="smsSchedulerStrategy" name="smsSchedulerStrategy" class="scheduling">
+    <option value="disabled">$i18n.getString( "disabled" )</option>
+    <option value="everyMidNight"#if ( $smsSchedulerStrategy && $smsSchedulerStrategy == "everyMidNight" ) selected="selected"#end>$i18n.getString( "every_mid_night" )</option>
+</select>
+</div>
+
+
 <!-- Submit -->
 
 <div class="setting">

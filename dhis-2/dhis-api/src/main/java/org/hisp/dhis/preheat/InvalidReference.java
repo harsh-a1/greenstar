@@ -32,7 +32,9 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.google.common.base.MoreObjects;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.common.IdentifiableObjectUtils;
 import org.hisp.dhis.schema.Property;
+import org.springframework.util.Assert;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
@@ -44,16 +46,24 @@ public class InvalidReference
 
     private PreheatIdentifier identifier;
 
+    private Object object;
+
     private IdentifiableObject refObject;
 
     private Property property;
 
-    public InvalidReference( String name, PreheatIdentifier identifier, IdentifiableObject refObject, Property property )
+    public InvalidReference( Object object, PreheatIdentifier identifier, IdentifiableObject refObject, Property property )
     {
-        this.name = name;
+        Assert.notNull( object );
+        Assert.notNull( identifier );
+        Assert.notNull( refObject );
+        Assert.notNull( property );
+
+        this.object = object;
         this.identifier = identifier;
         this.refObject = refObject;
         this.property = property;
+        this.name = IdentifiableObjectUtils.getDisplayName( object );
     }
 
     public String getName()
@@ -74,6 +84,16 @@ public class InvalidReference
     public void setIdentifier( PreheatIdentifier identifier )
     {
         this.identifier = identifier;
+    }
+
+    public Object getObject()
+    {
+        return object;
+    }
+
+    public void setObject( Object object )
+    {
+        this.object = object;
     }
 
     public IdentifiableObject getRefObject()
@@ -100,6 +120,7 @@ public class InvalidReference
     public String toString()
     {
         return MoreObjects.toStringHelper( this )
+            .add( "name", name )
             .add( "identifier", identifier )
             .add( "refObject", refObject )
             .toString();

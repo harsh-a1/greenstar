@@ -45,6 +45,8 @@ public interface SchedulingManager
     String TASK_ANALYTICS_LAST_3_YEARS = "analyticsLast3YearsTask";
     String TASK_MONITORING_LAST_DAY = "monitoringLastDayTask";
     String TASK_DATA_SYNCH = "dataSynchTask";
+    String TASK_SMS_SCHEDULER = "smsSchedulerTask";
+    String TASK_SEND_SCHEDULED_SMS = "sendScheduledMessageTask";
     
     /**
      * Schedules all tasks.

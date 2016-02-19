@@ -16,7 +16,7 @@
         <tbody>
             <tr ng-repeat="eventGridColumn in eventGridColumns" ng-if="eventGridColumn.id !== 'comment' && eventGridColumn.id !== 'uid' && eventGridColumn.id !== 'eventDate' && !hiddenFields[eventGridColumn.id]">
                 <td >
-                    {{eventGridColumn.name}}
+                    {{eventGridColumn.displayName}}
                     <span ng-if="eventGridColumn.compulsory" class="required">*</span>                    
                 </td>
                 <td >
@@ -31,9 +31,9 @@
                                            ng-disabled="assignedFields[eventGridColumn.id]"
                                            on-select="saveDatavalue()"
                                            style="width:100%;">
-                                    <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.name  || $select.selected}}</ui-select-match>
-                                    <ui-select-choices  repeat="option.name as option in optionSets[prStDes[eventGridColumn.id].dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
-                                        <span ng-bind-html="option.name | highlight: $select.search"></span>
+                                    <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                                    <ui-select-choices  repeat="option.displayName as option in optionSets[prStDes[eventGridColumn.id].dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
+                                        <span ng-bind-html="option.displayName | highlight: $select.search"></span>
                                     </ui-select-choices>
                                 </ui-select>
                             </div>
@@ -57,7 +57,7 @@
                                            ng-required={{eventGridColumn.compulsory}}
                                            ng-disabled="assignedFields[eventGridColumn.id]"
                                            ng-model="currentEvent[eventGridColumn.id]"
-                                           value={{option.name}}> {{option.name}}<br>
+                                           value={{option.displayName}}> {{option.displayName}}<br>
                                 </label>
                             </div>
                         </div>
@@ -238,7 +238,7 @@
                     </ng-form>
                 </td>
                 <td ng-if="currentEvent.event && currentEvent.event !== 'SINGLE_EVENT'">
-                    <d2-audit dataelement-id="{{prStDes[eventGridColumn.id].dataElement.id}}" dataelement-name="{{prStDes[eventGridColumn.id].dataElement.name}}"  current-event="{{currentEvent.event}}"></d2-audit>
+                    <d2-audit dataelement-id="{{prStDes[eventGridColumn.id].dataElement.id}}" dataelement-name="{{prStDes[eventGridColumn.id].dataElement.displayName}}"  current-event="{{currentEvent.event}}"></d2-audit>
                 </td>
             </tr>        
         </tbody>
@@ -250,11 +250,11 @@
     <div ng-include="'views/event-details.html'"></div>
     <div ng-repeat='section in selectedProgramStage.programStageSections' ng-if="section.id === selectedSection.id || selectedSection.id === 'ALL' && !hiddenSections[section.id] ">
         <div class="vertical-spacing section-label">
-           {{section.name}}
+           {{section.displayName}}
         </div>
         
         <div class="vertical-spacing" ng-if="!section.programStageDataElements || section.programStageDataElements.length === 0">
-            <div class="alert alert-warning">{{'section'| translate}} {{section.name}} {{'has_no_dataelements'| translate}}</div>
+            <div class="alert alert-warning">{{'section'| translate}} {{section.displayName}} {{'has_no_dataelements'| translate}}</div>
         </div>  
         <table class="dhis2-list-table-striped">
             <thead>                        
@@ -272,7 +272,7 @@
             <tbody>       
                 <tr ng-repeat="de in section.programStageDataElements" ng-if="!hiddenFields[de.dataElement.id]">
                     <td >
-                        {{prStDes[de.dataElement.id].dataElement.formName ? prStDes[de.dataElement.id].dataElement.formName : prStDes[de.dataElement.id].dataElement.name}}                         
+                        {{prStDes[de.dataElement.id].dataElement.formName ? prStDes[de.dataElement.id].dataElement.formName : prStDes[de.dataElement.id].dataElement.displayName}}                         
                         <span ng-if="prStDes[de.dataElement.id].compulsory" class="required">*</span>                        
                     </td>
                     <td>
@@ -288,9 +288,9 @@
                                                input-field-id={{de.dataElement.id}} 
                                                on-select="saveDatavalue()"
                                                style="width:100%;">
-                                            <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.name || $select.selected}}</ui-select-match>
-                                            <ui-select-choices  repeat="option.name as option in optionSets[prStDes[de.dataElement.id].dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
-                                                <span ng-bind-html="option.name | highlight: $select.search"></span>
+                                            <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName || $select.selected}}</ui-select-match>
+                                            <ui-select-choices  repeat="option.displayName as option in optionSets[prStDes[de.dataElement.id].dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
+                                                <span ng-bind-html="option.displayName | highlight: $select.search"></span>
                                             </ui-select-choices>
                                         </ui-select>
                                     </span>
@@ -316,7 +316,7 @@
                                                    ng-required={{prStDes[de.dataElement.id].compulsory}}
                                                    ng-disabled="assignedFields[de.dataElement.id]"
                                                    ng-model="currentEvent[de.dataElement.id]"
-                                                   value={{option.name}}> {{option.name}}
+                                                   value={{option.displayName}}> {{option.displayName}}
                                                 <br>
                                         </label><br>
                                     </span>                                    
@@ -501,11 +501,11 @@
                             </div>
                         </ng-form>
                         <!--<span class="hideInPrint audit-icon" ng-if="currentEvent.event && currentEvent.event !== 'SINGLE_EVENT'">
-                            <d2-audit dataelement-id="{{de.dataElement.id}}" dataelement-name="{{prStDes[de.dataElement.id].dataElement.name}}"  current-event="{{currentEvent.event}}"></d2-audit>
+                            <d2-audit dataelement-id="{{de.dataElement.id}}" dataelement-name="{{prStDes[de.dataElement.id].dataElement.displayName}}"  current-event="{{currentEvent.event}}"></d2-audit>
                         </span>-->
                     </td>
                     <td ng-if="currentEvent.event && currentEvent.event !== 'SINGLE_EVENT'">
-                        <d2-audit dataelement-id="{{de.dataElement.id}}" dataelement-name="{{prStDes[de.dataElement.id].dataElement.name}}"  current-event="{{currentEvent.event}}"></d2-audit>
+                        <d2-audit dataelement-id="{{de.dataElement.id}}" dataelement-name="{{prStDes[de.dataElement.id].dataElement.displayName}}"  current-event="{{currentEvent.event}}"></d2-audit>
                     </td>
                 </tr>
             </tbody>

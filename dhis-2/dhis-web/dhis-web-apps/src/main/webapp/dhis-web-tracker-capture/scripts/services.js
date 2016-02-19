@@ -138,7 +138,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                 p.endDate = DateUtils.formatFromApiToUser(p.endDate);
                 p.startDate = DateUtils.formatFromApiToUser(p.startDate);
                 
-                if(moment(p.endDate).isAfter(eventDateOffSet)){                    
+                if(moment(p.endDate, calendarSetting.momentFormat).isAfter(moment(eventDateOffSet,calendarSetting.momentFormat))){
                     availablePeriods.push( p );
                 }
             });                
@@ -189,7 +189,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
         getCode: function(options, key){
             if(options){
                 for(var i=0; i<options.length; i++){
-                    if( key === options[i].name){
+                    if( key === options[i].displayName){
                         return options[i].code;
                     }
                 }
@@ -200,7 +200,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             if(options){
                 for(var i=0; i<options.length; i++){                    
                     if( key === options[i].code){
-                        return options[i].name;
+                        return options[i].displayName;
                     }
                 }
             }            
@@ -243,7 +243,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
 })
 
 /* Factory to fetch programs */
-.factory('ProgramFactory', function($q, $rootScope, SessionStorageService, TCStorageService) { 
+.factory('ProgramFactory', function($q, $rootScope, SessionStorageService, TCStorageService, orderByFilter) { 
     
     var userHasValidRole = function(program, userRoles){
         
@@ -304,6 +304,8 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                         }
                     });
                     
+                    programs = orderByFilter(programs, '-displayName').reverse();
+                    
                     if(programs.length === 0){
                         selectedProgram = null;
                     }
@@ -323,6 +325,10 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                                 selectedProgram = null;
                             }
                         }
+                    }
+                        
+                    if(!selectedProgram || angular.isUndefined(selectedProgram) && programs.legth > 0){
+                        selectedProgram = programs[0];
                     }
                     
                     $rootScope.$apply(function(){
@@ -360,6 +366,8 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                         }
                     });
                     
+                    programs = orderByFilter(programs, '-displayName').reverse();
+                    
                     if(programs.length === 0){
                         selectedProgram = null;
                     }
@@ -379,6 +387,10 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                                 selectedProgram = null;
                             }
                         }
+                    }
+                                        
+                    if(!selectedProgram || angular.isUndefined(selectedProgram) && programs.legth > 0){
+                        selectedProgram = programs[0];
                     }
                     
                     $rootScope.$apply(function(){
@@ -471,12 +483,12 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
 })
 
 /* Factory for fetching OrgUnit */
-.factory('OrgUnitFactory', function($http, SessionStorageService) {    
+.factory('OrgUnitFactory', function($http) {    
     var orgUnit, orgUnitPromise, rootOrgUnitPromise,orgUnitTreePromise;
     return {
         get: function(uid){            
             if( orgUnit !== uid ){
-                orgUnitPromise = $http.get( '../api/organisationUnits.json?filter=id:eq:' + uid + '&fields=id,name,level,children[id,name,level,children[id,name,level]]&paging=false' ).then(function(response){
+                orgUnitPromise = $http.get( '../api/organisationUnits.json?filter=id:eq:' + uid + '&fields=id,displayName,level,children[id,displayName,level,children[id,displayName,level]]&paging=false' ).then(function(response){
                     orgUnit = response.data.id;
                     return response.data;
                 });
@@ -484,19 +496,8 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             return orgUnitPromise;
         },
         getSearchTreeRoot: function(){
-            //var roles = SessionStorageService.get('USER_ROLES');
             if(!rootOrgUnitPromise){
-                var url = '../api/me.json?fields=organisationUnits[id,name,level,children[id,name,level,children[id,name,level]]]&paging=false';
-                /*if( roles && roles.userCredentials && roles.userCredentials.userRoles){
-                    var userRoles = roles.userCredentials.userRoles;
-                    for(var i=0; i<userRoles.length; i++){
-                        if(userRoles[i].authorities.indexOf('ALL') !== -1 || 
-                          userRoles[i].authorities.indexOf('F_TRACKED_ENTITY_INSTANCE_SEARCH_IN_ALL_ORGUNITS') !== -1 ){                        
-                          url = '../api/organisationUnits.json?filter=level:eq:1&fields=id,name,children[id,name,children[id,name]]&paging=false';
-                          i=userRoles.length;
-                        }
-                    }  
-                }*/
+                var url = '../api/me.json?fields=organisationUnits[id,displayName,level,children[id,displayName,level,children[id,displayName,level]]]&paging=false';                
                 rootOrgUnitPromise = $http.get( url ).then(function(response){
                     return response.data;
                 });
@@ -539,7 +540,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             for(var k in attributesById){
                 if( formTei[k] ){
                     var att = attributesById[k];
-                    tei.attributes.push({attribute: att.id, value: formTei[k], displayName: att.name, valueType: att.valueType});
+                    tei.attributes.push({attribute: att.id, value: formTei[k], displayName: att.displayName, valueType: att.valueType});
                     formEmpty = false;              
                 }
                 delete tei[k];
@@ -681,7 +682,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                 var tei = response.data;
                 angular.forEach(tei.attributes, function(att){                    
                     if(attributesById[att.attribute]){
-                        att.displayName = attributesById[att.attribute].name;
+                        att.displayName = attributesById[att.attribute].displayName;
                     }
                     att.value = AttributesFactory.formatAttributeValue(att, attributesById, optionSets, 'USER');
                 });
@@ -907,12 +908,12 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                         teiAttributes[j].order = i;
                         teiAttributes[j].mandatory = requiredAttributes[i].mandatory ? requiredAttributes[i].mandatory : false;
                         teiAttributes[j].allowFutureDate = requiredAttributes[i].allowFutureDate ? requiredAttributes[i].allowFutureDate : false;
-                        teiAttributes[j].displayName = requiredAttributes[i].name;
+                        teiAttributes[j].displayName = requiredAttributes[i].displayName;
                     }
                 }
 
                 if(!processed && fromEnrollment){//attribute was empty, so a chance to put some value
-                    teiAttributes.push({show: true, order: i, allowFutureDate: requiredAttributes[i].allowFutureDate ? requiredAttributes[i].allowFutureDate : false, mandatory: requiredAttributes[i].mandatory ? requiredAttributes[i].mandatory : false, attribute: requiredAttributes[i].id, displayName: requiredAttributes[i].name, type: requiredAttributes[i].valueType, value: ''});
+                    teiAttributes.push({show: true, order: i, allowFutureDate: requiredAttributes[i].allowFutureDate ? requiredAttributes[i].allowFutureDate : false, mandatory: requiredAttributes[i].mandatory ? requiredAttributes[i].mandatory : false, attribute: requiredAttributes[i].id, displayName: requiredAttributes[i].displayName, type: requiredAttributes[i].valueType, value: ''});
                 }                   
             }
 
@@ -1203,13 +1204,13 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                         if(pi.displayInForm){
                             var newAction = {
                                     id:pi.id,
-                                    content:pi.displayDescription ? pi.displayDescription : pi.name,
+                                    content:pi.displayDescription ? pi.displayDescription : pi.displayName,
                                     data:pi.expression,
                                     programRuleActionType:'DISPLAYKEYVALUEPAIR',
                                     location:'indicators'
                                 };
                             var newRule = {
-                                    name:pi.name,
+                                    name:pi.displayName,
                                     id: pi.id,
                                     shortname:pi.shortname,
                                     code:pi.code,
@@ -1280,12 +1281,12 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                                 angular.forEach(variableObjectsCurrentExpression, function(variableCurrentRule) {
                                    if(valueCountText) {
                                        //This is not the first value in the value count part of the expression. 
-                                       valueCountText +=  ' + d2:count(\'' + variableCurrentRule.name + '\')';
+                                       valueCountText +=  ' + d2:count(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                    else
                                    {
                                        //This is the first part value in the value count expression:
-                                       valueCountText = '(d2:count(\'' + variableCurrentRule.name + '\')';
+                                       valueCountText = '(d2:count(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                 });
                                 //To finish the value count expression we need to close the paranthesis:
@@ -1300,12 +1301,12 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                                 angular.forEach(variableObjectsCurrentExpression, function(variableCurrentRule) {
                                    if(zeroPosValueCountText) {
                                        //This is not the first value in the value count part of the expression. 
-                                       zeroPosValueCountText +=  '+ d2:countifzeropos(\'' + variableCurrentRule.name + '\')';
+                                       zeroPosValueCountText +=  '+ d2:countifzeropos(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                    else
                                    {
                                        //This is the first part value in the value count expression:
-                                       zeroPosValueCountText = '(d2:countifzeropos(\'' + variableCurrentRule.name + '\')';
+                                       zeroPosValueCountText = '(d2:countifzeropos(\'' + variableCurrentRule.displayName + '\')';
                                    }
                                 });
                                 //To finish the value count expression we need to close the paranthesis:
@@ -1546,7 +1547,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             //grid.headers[7..] = Attribute, Attribute,.... 
             var attributes = [];
             for(var i=6; i<grid.headers.length; i++){
-                attributes.push({id: grid.headers[i].name, name: grid.headers[i].column, type: grid.headers[i].type});
+                attributes.push({id: grid.headers[i].name, displayName: grid.headers[i].column, type: grid.headers[i].type});
             }
 
             var entityList = {own: [], other: []};
@@ -1626,9 +1627,9 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             }
        
             //also add extra columns which are not part of attributes (orgunit for example)
-            columns.push({id: 'orgUnitName', name: $translate.instant('registering_unit'), valueType: 'TEXT', displayInListNoProgram: false, attribute: false});
-            columns.push({id: 'created', name: $translate.instant('registration_date'), valueType: 'DATE', displayInListNoProgram: false, attribute: false});
-            columns.push({id: 'inactive', name: $translate.instant('inactive'), valueType: 'BOOLEAN', displayInListNoProgram: false, attribute: false});
+            columns.push({id: 'orgUnitName', displayName: $translate.instant('registering_unit'), valueType: 'TEXT', displayInListNoProgram: false, attribute: false});
+            columns.push({id: 'created', displayName: $translate.instant('registration_date'), valueType: 'DATE', displayInListNoProgram: false, attribute: false});
+            columns.push({id: 'inactive', displayName: $translate.instant('inactive'), valueType: 'BOOLEAN', displayInListNoProgram: false, attribute: false});
             columns = columns.concat(returnAttributes ? returnAttributes : []);
             
             //generate grid column for the selected program/attributes
@@ -1655,7 +1656,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                 var d = {};
                 angular.forEach(columns, function(col){
                     if(col.show){
-                        d[col.name] = row[col.id];
+                        d[col.displayName] = row[col.id];
                     }                
                 });
                 data.push(d);            
@@ -1666,7 +1667,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             var header = []; 
             angular.forEach(columns, function(col){
                 if(col.show){
-                    header.push($translate.instant(col.name));
+                    header.push($translate.instant(col.displayName));
                 }
             });        
             return header;
@@ -1741,8 +1742,8 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                               programStage: programStage.id, 
                               program: program.id,
                               orgUnit: orgUnit.id,
-                              orgUnitName: orgUnit.name,
-                              name: programStage.name,
+                              orgUnitName: orgUnit.displayName,
+                              name: programStage.displayName,
                               excecutionDateLabel: programStage.excecutionDateLabel ? programStage.excecutionDateLabel : $translate.instant('report_date'),
                               enrollmentStatus: 'ACTIVE',
                               enrollment: enrollment.enrollment,
@@ -1751,7 +1752,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
             if(programStage.periodType){                
                 var periods = getEventDuePeriod(eventsPerStage, programStage, enrollment);
                 dummyEvent.dueDate = periods[0].endDate;
-                dummyEvent.periodName = periods[0].name;
+                dummyEvent.periodName = periods[0].displayName;
                 dummyEvent.eventDate = dummyEvent.dueDate;
                 dummyEvent.periods = periods;
             }
@@ -1910,7 +1911,7 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
 
 .service('EventCreationService', function($modal){
             
-        this.showModal = function(eventsByStage, stage, availableStages,programStages,selectedEntity,selectedProgram,selectedOrgUnit,selectedEnrollment, autoCreate, eventCreationAction,allEventsSorted, suggestedStage){
+        this.showModal = function(eventsByStage, stage, availableStages,programStages,selectedEntity,selectedProgram,selectedOrgUnit,selectedEnrollment, autoCreate, eventCreationAction,allEventsSorted, suggestedStage, selectedCategories){
             var modalInstance = $modal.open({
                 templateUrl: 'components/dataentry/new-event.html',
                 controller: 'EventCreationController',
@@ -1950,7 +1951,10 @@ var trackerCaptureServices = angular.module('trackerCaptureServices', ['ngResour
                     },
                     suggestedStage: function(){
                         return suggestedStage;
-                    }
+                    },
+                	selectedCategories: function () {
+                    	return selectedCategories;
+	                }
                 }
             }).result;
             return modalInstance;

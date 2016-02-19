@@ -39,7 +39,7 @@ import org.hisp.dhis.common.CombinationGenerator;
 import org.hisp.dhis.common.DataDimensionType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
@@ -65,13 +65,21 @@ public class DataElementCategoryCombo
     private List<DataElementCategory> categories = new ArrayList<>();
 
     /**
-     * A set of category option combos. Use getSortedOptionCombos() to get a
-     * sorted list of category option combos.
+     * A set of category option combinations. Use getSortedOptionCombos() to get a
+     * sorted list of category option combinations.
      */
     private Set<DataElementCategoryOptionCombo> optionCombos = new HashSet<>();
 
+    /**
+     * Type of data dimension. Category combinations of type DISAGGREGATION can
+     * be linked to data elements, whereas type ATTRIBUTE can be linked to data
+     * sets.
+     */
     private DataDimensionType dataDimensionType;
 
+    /**
+     * Indicates whether to skip total values for the categories in reports.
+     */
     private boolean skipTotal;
 
     // -------------------------------------------------------------------------
@@ -323,9 +331,9 @@ public class DataElementCategoryCombo
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -333,11 +341,11 @@ public class DataElementCategoryCombo
 
             skipTotal = categoryCombo.isSkipTotal();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 dataDimensionType = categoryCombo.getDataDimensionType();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 dataDimensionType = categoryCombo.getDataDimensionType() == null ? dataDimensionType : categoryCombo.getDataDimensionType();
             }

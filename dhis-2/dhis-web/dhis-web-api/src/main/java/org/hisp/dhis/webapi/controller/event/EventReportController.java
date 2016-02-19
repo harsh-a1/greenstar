@@ -110,7 +110,7 @@ public class EventReportController
 
         mergeEventReport( newReport );
 
-        report.mergeWith( newReport, importOptions.getMergeStrategy() );
+        report.mergeWith( newReport, importOptions.getMergeMode() );
 
         eventReportService.updateEventReport( report );
     }

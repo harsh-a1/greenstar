@@ -48,6 +48,7 @@ import org.jclouds.domain.Credentials;
 import org.jclouds.domain.Location;
 import org.jclouds.filesystem.reference.FilesystemConstants;
 import org.jclouds.http.HttpRequest;
+import org.jclouds.http.HttpResponseException;
 import org.joda.time.Minutes;
 
 import java.io.File;
@@ -168,10 +169,18 @@ public class JCloudsFileResourceContentStore
         Optional<? extends Location> configuredLocation = blobStore.listAssignableLocations()
             .stream().filter( l -> l.getId().equals( location ) ).findFirst();
 
-        blobStore.createContainerInLocation( configuredLocation.isPresent() ? configuredLocation.get() : null, container );
+        try
+        {
+            blobStore.createContainerInLocation( configuredLocation.isPresent() ? configuredLocation.get() : null, container );
 
-        log.info( "File store configured with provider '" + provider + "' and container '" + container + "'. " +
-            ( configuredLocation.isPresent() ? "Provider location: " + configuredLocation.get().getId() : StringUtils.EMPTY ) );
+            log.info( "File store configured with provider '" + provider + "' and container '" + container + "'. " +
+                ( configuredLocation.isPresent() ? "Provider location: " + configuredLocation.get().getId() : StringUtils.EMPTY ) );
+        }
+        catch ( HttpResponseException ex )
+        {
+            log.error( "Could not configure file store with provider '" + provider + "' and container '" + container + "'. " +
+                "Check your internet connectivity. File storage will not be available.", ex );
+        }
     }
 
     public void cleanUp()

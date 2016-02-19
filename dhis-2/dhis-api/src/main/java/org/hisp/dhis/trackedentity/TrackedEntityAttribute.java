@@ -1,6 +1,23 @@
 package org.hisp.dhis.trackedentity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import org.hisp.dhis.common.BaseDimensionalItemObject;
+import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionType;
+import org.hisp.dhis.common.DxfNamespaces;
+import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.common.ValueType;
+import org.hisp.dhis.common.view.DetailedView;
+import org.hisp.dhis.common.view.ExportView;
+import org.hisp.dhis.option.Option;
+import org.hisp.dhis.option.OptionSet;
+import org.hisp.dhis.schema.annotation.PropertyRange;
 
 /*
  * Copyright (c) 2004-2016, University of Oslo
@@ -29,25 +46,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
-import org.hisp.dhis.common.BaseDimensionalItemObject;
-import org.hisp.dhis.common.BaseIdentifiableObject;
-import org.hisp.dhis.common.DimensionType;
-import org.hisp.dhis.common.DxfNamespaces;
-import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
-import org.hisp.dhis.common.ValueType;
-import org.hisp.dhis.common.view.DetailedView;
-import org.hisp.dhis.common.view.ExportView;
-import org.hisp.dhis.option.Option;
-import org.hisp.dhis.option.OptionSet;
-import org.hisp.dhis.schema.annotation.PropertyRange;
 
 /**
  * @author Abyot Asalefew
@@ -124,7 +122,7 @@ public class TrackedEntityAttribute
     {
         return valueType.isDate();
     }
-    
+
     /**
      * Indicates whether this attribute has confidential information.
      */
@@ -397,15 +395,15 @@ public class TrackedEntityAttribute
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             TrackedEntityAttribute trackedEntityAttribute = (TrackedEntityAttribute) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 description = trackedEntityAttribute.getDescription();
                 valueType = trackedEntityAttribute.getValueType();
@@ -421,7 +419,7 @@ public class TrackedEntityAttribute
                 programScope = trackedEntityAttribute.getProgramScope();
                 optionSet = trackedEntityAttribute.getOptionSet();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 description = trackedEntityAttribute.getDescription() == null ? description : trackedEntityAttribute.getDescription();
                 valueType = trackedEntityAttribute.getValueType() == null ? valueType : trackedEntityAttribute.getValueType();

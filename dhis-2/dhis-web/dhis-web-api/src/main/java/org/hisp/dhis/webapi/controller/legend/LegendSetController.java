@@ -96,7 +96,7 @@ public class LegendSetController
         LegendSet newLegendSet = renderService.fromJson( request.getInputStream(), LegendSet.class );
         newLegendSet.getLegends().forEach( legendService::addLegend );
 
-        legendSet.mergeWith( newLegendSet, importOptions.getMergeStrategy() );
+        legendSet.mergeWith( newLegendSet, importOptions.getMergeMode() );
 
         legendService.updateLegendSet( legendSet );
     }

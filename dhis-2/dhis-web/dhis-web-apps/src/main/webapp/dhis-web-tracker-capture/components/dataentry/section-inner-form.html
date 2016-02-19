@@ -9,9 +9,9 @@
                             name="foo"
                             on-select="saveDatavalue(prStDes[de.dataElement.id], innerForm.foo)"
                             ng-style="{'width':'100%'}"/>
-                    <ui-select-match allow-clear="true" ng-class="getInputNotifcationClass(prStDes[de.dataElement.id].dataElement.id,true, currentEvent)"  class="form-control-ui-select"  placeholder="{{'select_or_search' | translate}}">{{$select.selected.name  || $select.selected}}</ui-select-match>
-                    <ui-select-choices  repeat="option.name as option in optionSets[prStDes[de.dataElement.id].dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
-                        <span ng-bind-html="option.name | highlight: $select.search"></span>
+                    <ui-select-match allow-clear="true" ng-class="getInputNotifcationClass(prStDes[de.dataElement.id].dataElement.id,true, currentEvent)"  class="form-control-ui-select"  placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                    <ui-select-choices  repeat="option.displayName as option in optionSets[prStDes[de.dataElement.id].dataElement.optionSet.id].options | filter: $select.search | limitTo:maxOptionSize">
+                        <span ng-bind-html="option.displayName | highlight: $select.search"></span>
                     </ui-select-choices>
                 </ui-select>
 
@@ -41,7 +41,7 @@
                                    ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed || assignedFields[currentEvent.event][de.dataElement.id]"
                                    ng-model="currentEvent[prStDes[de.dataElement.id].dataElement.id]"
                                    ng-change="saveDatavalue(prStDes[de.dataElement.id])"
-                                   value={{option.name}}> {{option.name}}
+                                   value={{option.displayName}}> {{option.displayName}}
                         </label><br>
                     </span>
             </div>

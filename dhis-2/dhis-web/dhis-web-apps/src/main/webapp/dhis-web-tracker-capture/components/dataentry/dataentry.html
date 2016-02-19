@@ -35,7 +35,7 @@
                 <span ng-repeat="stage in headerStagesWithoutCurrent()" ng-if='useMenuMultiMode'>
                     <span ng-if="$index !== 0"> | </span>
                     <a href ng-click="openStageFromMenu(stage, stage.id)">
-                        {{stage.name}} ({{getStageEventCnt(stage)}})
+                        {{stage.displayName}} ({{getStageEventCnt(stage)}})
                     </a>
                 </span>
                 <a href ng-click="toggleLegend()" title="{{'event_color_legend'| translate}}" class="small-horizonal-spacing"><i class="fa fa-info-circle vertical-center"></i></a>

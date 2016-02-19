@@ -47,20 +47,21 @@
                     <tr>
                         <td>{{'org_unit' | translate}}</td>
                         <td>
-                            <input type="text" class="form-control" selected-org-unit ng-model="selectedOrgUnit.name" value="{{selectedOrgUnit.name || 'please_select'| translate}}" ng-disabled="true">                                                                                        
+                            <input type="text" class="form-control" selected-org-unit ng-model="selectedOrgUnit.displayName" value="{{selectedOrgUnit.displayName || 'please_select'| translate}}" ng-disabled="true">                                                                                        
                         </td>
                     </tr>
                     <tr>
                         <td>
                             {{'program'| translate}}
                         </td>
-                        <td>
-                            <select ng-model="selectedProgram"
-                                    class="form-control"
-                                    ng-options="program as program.name for program in programs | orderBy: 'name'"
-                                    ng-disabled="programs.length < 1" ng-selected="programs.length === 1">
-                                <option ng-if="programs.length !== 1" value="">{{programs.length > 1 ? 'please_select_a_program' : 'no_program_exists'| translate}}</option>
-                            </select>
+                        <td>                          
+                            <ui-select ng-model="model.selectedProgram" 
+                                    theme="select2" style="width:100%;">
+                                <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                                <ui-select-choices  repeat="program in programs | filter: $select.search | limitTo:maxOptionSize">
+                                    <span ng-bind-html="program.displayName | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
                         </td>
                     </tr>
                     <tr>
@@ -80,64 +81,54 @@
                                 <input type="checkbox" ng-change="markForFollowup()" ng-model="displayMode.onlyMarkedFollowup"/>  {{'only_marked_for_followup'| translate}}
                             </label>                                
                         </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{'date'| translate}}
-                        </td>
-                        <td>
-                            <select ng-model="selectedDate" class="form-control"
-                                    ng-options="date as date.name for date in dates | orderBy: 'numOfDays'">
-                            </select>
-                        </td>
-                    </tr>
+                    </tr>                   
                 </table>
             </div>
-
-            <div class="col-md-5 trim" ng-if="!datePicker.visible">
-                <div class="row row-with-go-button">
-                    <button type="button" class="btn btn-primary" ng-click="generateReport()" ng-disabled="!selectedProgram">{{'go'| translate}}</button>
-                    <button type="button"
-                        class="btn btn-success small-horizonal-spacing"
-                        ng-if="upcomingEvents.length > 0"
-                        onclick="javascript:window.print()">
-                    {{'print'| translate}}
-                    </button>
-                    <button type="button"
-                        class="btn btn-info small-horizonal-spacing"
-                        ng-if="upcomingEvents.length > 0"
-                        ng-csv="generateReportData()"
-                        csv-header="generateReportHeader()"
-                        filename="upcomingEvents.csv">
-                    {{'excel_export'| translate}}
-                    </button>
-                </div>
-            </div>
         </div>
-        <div class="row" ng-if="datePicker.visible">
+        <div class="row">
             <div class="col-sm-8 col-md-6">
                 <table class="table-borderless">
                     <tr>
                         <td>
-                            <input type="text" 
-                                   name="reportStartDate" 
-                                   placeholder="{{'start_date'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})" 
-                                   class="form-control" 
-                                   d2-date 
-                                   ng-model="report.startDate" 
-                                   min-date="today" 
-                                   ng-required="true"/> 
-                            <span ng-show="outerForm.submitted && outerForm.reportStartDate.$invalid" style="color:red;font-size:12px">{{'required'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})</span>
+                            {{'date'| translate}}                            
+                            <a class="pull-right mouse-pointer" title="{{'close' | translate}}" ng-if="datePicker.visible" ng-click="hideDatePicker()">
+                                <i class="fa fa-times-circle"></i>
+                            </a>
                         </td>
-                        <td>
-                            <input type="text" name="reportEndDate" placeholder="{{'end_date'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})" class="form-control" d2-date ng-model="report.endDate" min-date="today" ng-required="true"/>
-                            <span ng-show="outerForm.submitted && outerForm.reportEndDate.$invalid" style="color:red;font-size:12px">{{'required'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})</span>
+                        <td ng-show="!datePicker.visible">
+                            <select ng-model="selectedDate" class="form-control"
+                                    ng-options="date as date.name for date in dates | orderBy: 'numOfDays'">
+                            </select>
+                        </td>
+                        <td ng-show="datePicker.visible">
+                            <div>
+                                <input type="text" 
+                                       name="reportStartDate" 
+                                       placeholder="{{'start_date'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})" 
+                                       class="form-control" 
+                                       d2-date 
+                                       ng-model="report.startDate" 
+                                       min-date="today" 
+                                       ng-required="true"/> 
+                                <span ng-show="outerForm.submitted && outerForm.reportStartDate.$invalid" style="color:red;font-size:12px">{{'required'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})</span>
+                            </div>
+                            <div>
+                                <input type="text" 
+                                       name="reportEndDate" 
+                                       placeholder="{{'end_date'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})" 
+                                       class="form-control" 
+                                       d2-date 
+                                       ng-model="report.endDate" 
+                                       min-date="today" 
+                                       ng-required="true"/>                            
+                                <span ng-show="outerForm.submitted && outerForm.reportEndDate.$invalid" style="color:red;font-size:12px">{{'required'| translate}} ({{dhis2CalendarFormat.keyDateFormat}})</span>
+                            </div>
                         </td>
                     </tr>
                 </table>                
             </div>
             <div class="col-md-6 trim">
-                <button type="button" class="btn btn-primary" ng-click="generateReport()" ng-disabled="!selectedProgram">{{'go'| translate}}</button>
+                <button type="button" class="btn btn-primary" ng-click="generateReport()" ng-disabled="!model.selectedProgram">{{'go'| translate}}</button>
                 <button type="button"
                         class="btn btn-success small-horizonal-spacing"
                         ng-if="upcomingEvents.length > 0"
@@ -160,7 +151,7 @@
                 <div class="alert alert-warning">{{'no_program_exists_report'| translate}}</div> 
             </div>
         </div>
-        <div class="row" ng-if="programs.length > 0 && !selectedProgram">        
+        <div class="row" ng-if="programs.length > 0 && !model.selectedProgram">        
             <div class="col-sm-8 col-md-6 vertical-spacing">
                 <div class="alert alert-warning">{{'please_select_program_report'| translate}}</div> 
             </div>
@@ -194,7 +185,7 @@
                                     <!-- sort icon begins -->
                                     <span ng-click="sortGrid(gridColumn)">
                                         <span ng-class="{true: 'red'} [sortColumn.id === gridColumn.id]"><i class="fa fa-sort hideInPrint"></i></span>
-                                        {{gridColumn.name}}
+                                        {{gridColumn.displayName}}
                                     </span>
                                     <!-- sort icon ends -->
 

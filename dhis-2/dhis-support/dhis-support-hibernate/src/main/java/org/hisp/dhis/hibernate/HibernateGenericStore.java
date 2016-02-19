@@ -334,13 +334,25 @@ public class HibernateGenericStore<T>
     @Override
     public int save( T object )
     {
-        return save( object, true );
+        return save( object, currentUserService.getCurrentUser(), true );
+    }
+
+    @Override
+    public int save( T object, User user )
+    {
+        return save( object, user, true );
     }
 
     @Override
     public int save( T object, boolean clearSharing )
     {
-        User currentUser = currentUserService.getCurrentUser();
+        return save( object, currentUserService.getCurrentUser(), clearSharing );
+    }
+
+    @Override
+    public int save( T object, User user, boolean clearSharing )
+    {
+        String username = user != null ? user.getUsername() : "system-process";
 
         if ( IdentifiableObject.class.isAssignableFrom( object.getClass() ) )
         {
@@ -359,37 +371,37 @@ public class HibernateGenericStore<T>
 
             if ( identifiableObject.getUser() == null )
             {
-                identifiableObject.setUser( currentUser );
+                identifiableObject.setUser( user );
             }
         }
 
-        if ( !Interpretation.class.isAssignableFrom( clazz ) && currentUser != null && aclService.isShareable( clazz ) )
+        if ( !Interpretation.class.isAssignableFrom( clazz ) && user != null && aclService.isShareable( clazz ) )
         {
             BaseIdentifiableObject identifiableObject = (BaseIdentifiableObject) object;
 
             if ( clearSharing )
             {
-                if ( aclService.canCreatePublic( currentUser, identifiableObject.getClass() ) )
+                if ( aclService.canCreatePublic( user, identifiableObject.getClass() ) )
                 {
                     if ( aclService.defaultPublic( identifiableObject.getClass() ) )
                     {
                         identifiableObject.setPublicAccess( AccessStringHelper.READ_WRITE );
                     }
                 }
-                else if ( aclService.canCreatePrivate( currentUser, identifiableObject.getClass() ) )
+                else if ( aclService.canCreatePrivate( user, identifiableObject.getClass() ) )
                 {
                     identifiableObject.setPublicAccess( AccessStringHelper.newInstance().build() );
                 }
             }
 
-            if ( !checkPublicAccess( currentUser, identifiableObject ) )
+            if ( !checkPublicAccess( user, identifiableObject ) )
             {
-                AuditLogUtil.infoWrapper( log, currentUserService.getCurrentUsername(), object, AuditLogUtil.ACTION_CREATE_DENIED );
+                AuditLogUtil.infoWrapper( log, username, object, AuditLogUtil.ACTION_CREATE_DENIED );
                 throw new CreateAccessDeniedException( object.toString() );
             }
         }
 
-        AuditLogUtil.infoWrapper( log, currentUserService.getCurrentUsername(), object, AuditLogUtil.ACTION_CREATE );
+        AuditLogUtil.infoWrapper( log, username, object, AuditLogUtil.ACTION_CREATE );
         return (Integer) sessionFactory.getCurrentSession().save( object );
     }
 
@@ -403,6 +415,14 @@ public class HibernateGenericStore<T>
     @Override
     public void update( T object )
     {
+        update( object, currentUserService.getCurrentUser() );
+    }
+
+    @Override
+    public void update( T object, User user )
+    {
+        String username = user != null ? user.getUsername() : "system-process";
+
         if ( IdentifiableObject.class.isInstance( object ) )
         {
             BaseIdentifiableObject identifiableObject = (BaseIdentifiableObject) object;
@@ -410,21 +430,46 @@ public class HibernateGenericStore<T>
 
             if ( identifiableObject.getUser() == null )
             {
-                identifiableObject.setUser( currentUserService.getCurrentUser() );
+                identifiableObject.setUser( user );
             }
         }
 
-        if ( !Interpretation.class.isAssignableFrom( clazz ) && !isUpdateAllowed( object ) )
+        if ( !Interpretation.class.isAssignableFrom( clazz ) && !isUpdateAllowed( object, user ) )
         {
-            AuditLogUtil.infoWrapper( log, currentUserService.getCurrentUsername(), object, AuditLogUtil.ACTION_UPDATE_DENIED );
+            AuditLogUtil.infoWrapper( log, username, object, AuditLogUtil.ACTION_UPDATE_DENIED );
             throw new UpdateAccessDeniedException( object.toString() );
         }
 
-        AuditLogUtil.infoWrapper( log, currentUserService.getCurrentUsername(), object, AuditLogUtil.ACTION_UPDATE );
+        AuditLogUtil.infoWrapper( log, username, object, AuditLogUtil.ACTION_UPDATE );
 
         if ( object != null )
         {
             sessionFactory.getCurrentSession().update( object );
+        }
+    }
+
+    @Override
+    public void delete( T object )
+    {
+        delete( object, currentUserService.getCurrentUser() );
+    }
+
+    @Override
+    public final void delete( T object, User user )
+    {
+        String username = user != null ? user.getUsername() : "system-process";
+
+        if ( !isDeleteAllowed( object, user ) )
+        {
+            AuditLogUtil.infoWrapper( log, username, object, AuditLogUtil.ACTION_DELETE_DENIED );
+            throw new DeleteAccessDeniedException( object.toString() );
+        }
+
+        AuditLogUtil.infoWrapper( log, username, object, AuditLogUtil.ACTION_DELETE );
+
+        if ( object != null )
+        {
+            sessionFactory.getCurrentSession().delete( object );
         }
     }
 
@@ -463,23 +508,6 @@ public class HibernateGenericStore<T>
         }
 
         return object;
-    }
-
-    @Override
-    public final void delete( T object )
-    {
-        if ( !isDeleteAllowed( object ) )
-        {
-            AuditLogUtil.infoWrapper( log, currentUserService.getCurrentUsername(), object, AuditLogUtil.ACTION_DELETE_DENIED );
-            throw new DeleteAccessDeniedException( object.toString() );
-        }
-
-        AuditLogUtil.infoWrapper( log, currentUserService.getCurrentUsername(), object, AuditLogUtil.ACTION_DELETE );
-
-        if ( object != null )
-        {
-            sessionFactory.getCurrentSession().delete( object );
-        }
     }
 
     @Override
@@ -607,46 +635,32 @@ public class HibernateGenericStore<T>
         return Dashboard.class.isAssignableFrom( clazz );
     }
 
-    protected boolean sharingEnabled( User currentUser )
+    protected boolean sharingEnabled( User user )
     {
-        return forceAcl() || (aclService.isShareable( clazz ) && !(currentUser == null || currentUser.isSuper()));
+        return forceAcl() || (aclService.isShareable( clazz ) && !(user == null || user.isSuper()));
     }
 
     protected boolean isReadAllowed( T object )
     {
-        if ( IdentifiableObject.class.isInstance( object ) )
-        {
-            IdentifiableObject idObject = (IdentifiableObject) object;
-
-            User currentUser = currentUserService.getCurrentUser();
-
-            if ( sharingEnabled( currentUser ) )
-            {
-                return aclService.canRead( currentUser, idObject );
-            }
-        }
-
-        return true;
+        return isReadAllowed( object, currentUserService.getCurrentUser() );
     }
 
-    protected boolean isWriteAllowed( T object )
+    protected boolean isReadAllowed( T object, User user )
     {
         if ( IdentifiableObject.class.isInstance( object ) )
         {
             IdentifiableObject idObject = (IdentifiableObject) object;
 
-            User currentUser = currentUserService.getCurrentUser();
-
-            if ( sharingEnabled( currentUser ) )
+            if ( sharingEnabled( user ) )
             {
-                return aclService.canWrite( currentUser, idObject );
+                return aclService.canRead( user, idObject );
             }
         }
 
         return true;
     }
 
-    protected boolean isUpdateAllowed( T object )
+    protected boolean isUpdateAllowed( T object, User user )
     {
         if ( IdentifiableObject.class.isInstance( object ) )
         {
@@ -654,14 +668,14 @@ public class HibernateGenericStore<T>
 
             if ( aclService.isShareable( clazz ) )
             {
-                return aclService.canUpdate( currentUserService.getCurrentUser(), idObject );
+                return aclService.canUpdate( user, idObject );
             }
         }
 
         return true;
     }
 
-    protected boolean isDeleteAllowed( T object )
+    protected boolean isDeleteAllowed( T object, User user )
     {
         if ( IdentifiableObject.class.isInstance( object ) )
         {
@@ -669,7 +683,7 @@ public class HibernateGenericStore<T>
 
             if ( aclService.isShareable( clazz ) )
             {
-                return aclService.canDelete( currentUserService.getCurrentUser(), idObject );
+                return aclService.canDelete( user, idObject );
             }
         }
 

@@ -43,7 +43,7 @@ import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.EventAnalyticalObject;
 import org.hisp.dhis.common.FontSize;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
@@ -570,9 +570,9 @@ public class EventReport
     // -------------------------------------------------------------------------
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -587,7 +587,7 @@ public class EventReport
             showHierarchy = report.isShowHierarchy();
             showDimensionLabels = report.isShowDimensionLabels();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 dataElementValueDimension = report.getDataElementValueDimension();
                 attributeValueDimension = report.getAttributeValueDimension();
@@ -600,7 +600,7 @@ public class EventReport
                 displayDensity = report.getDisplayDensity();
                 fontSize = report.getFontSize();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 dataElementValueDimension = report.getDataElementValueDimension() == null ? dataElementValueDimension : report.getDataElementValueDimension();
                 attributeValueDimension = report.getAttributeValueDimension() == null ? attributeValueDimension : report.getAttributeValueDimension();

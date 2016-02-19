@@ -39,7 +39,7 @@ import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.BaseNameableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.VersionedObject;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
@@ -121,7 +121,7 @@ public class Program
     private Program relatedProgram;
 
     private Boolean dataEntryMethod = false;
-    
+
     private TrackedEntity trackedEntity;
 
     private DataEntryForm dataEntryForm;
@@ -141,7 +141,7 @@ public class Program
      * The approval workflow (if any) for this program.
      */
     private DataApprovalWorkflow workflow;
-    
+
     private Boolean displayFrontPageList = false;
 
     // -------------------------------------------------------------------------
@@ -234,7 +234,14 @@ public class Program
      */
     public List<TrackedEntityAttribute> getTrackedEntityAttributes()
     {
-        return programAttributes.stream().map( p -> p.getAttribute() ).collect( Collectors.toList() );
+        List<TrackedEntityAttribute> attributes = new ArrayList<>();
+        
+        for ( ProgramTrackedEntityAttribute attribute : programAttributes )
+        {
+            attributes.add( attribute.getAttribute() );
+        }
+        
+        return attributes;
     }
 
     /**
@@ -243,7 +250,7 @@ public class Program
      */
     public List<TrackedEntityAttribute> getNonConfidentialTrackedEntityAttributes()
     {
-        return programAttributes.stream().map( p -> p.getAttribute() ).filter( a -> a.isConfidential() ).collect( Collectors.toList() );
+        return getTrackedEntityAttributes().stream().filter( a -> !a.isConfidential() ).collect( Collectors.toList() );
     }
 
     /**
@@ -252,7 +259,7 @@ public class Program
      */
     public List<TrackedEntityAttribute> getNonConfidentialTrackedEntityAttributesWithLegendSet()
     {
-        return getTrackedEntityAttributes().stream().filter( a -> a.isConfidential() && a.hasLegendSet() && a.isNumericType() ).collect( Collectors.toList() );
+        return getTrackedEntityAttributes().stream().filter( a -> !a.isConfidential() && a.hasLegendSet() && a.isNumericType() ).collect( Collectors.toList() );
     }
 
     public ProgramStage getProgramStageByStage( int stage )
@@ -681,7 +688,7 @@ public class Program
     {
         this.skipOffline = skipOffline;
     }
-    
+
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class } )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
@@ -696,9 +703,9 @@ public class Program
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -706,7 +713,7 @@ public class Program
 
             version = program.getVersion();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 description = program.getDescription();
                 enrollmentDateLabel = program.getEnrollmentDateLabel();
@@ -724,7 +731,7 @@ public class Program
                 dataEntryMethod = program.getDataEntryMethod();
                 trackedEntity = program.getTrackedEntity();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 description = program.getDescription() == null ? description : program.getDescription();
                 enrollmentDateLabel = program.getEnrollmentDateLabel() == null ? enrollmentDateLabel : program.getEnrollmentDateLabel();
@@ -766,5 +773,5 @@ public class Program
             instanceReminders.clear();
             instanceReminders.addAll( program.getInstanceReminders() );
         }
-    }    
+    }
 }

@@ -19,7 +19,7 @@
                         </div>
                         <div class="compare-form-other-events-column">                    
                                 <div ng-class="getCompareModeColSize(compareModeColDefs.otherEvent)" ng-repeat="otherEvent in otherStageEvents" class="other-events-alignment">
-                                    {{currentStage.name}} {{otherStageEventIndexes[$index].position + 1}}
+                                    {{currentStage.displayName}} {{otherStageEventIndexes[$index].position + 1}}
                                 </div>                    
                         </div>                                
                         <div class="compare-form-navigation-column-forward compare-form-navigation-column">
@@ -37,7 +37,7 @@
                             {{'current' | translate}}
                         </span>  
                         <span ng-if="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed">                    
-                            {{currentStage.name}} {{currentStageEventNumber()}}
+                            {{currentStage.displayName}} {{currentStageEventNumber()}}
                         </span>                        
                     </div>
                     <div ng-if="allowProvidedElsewhereExists[currentStage.id]" ng-class="getCompareModeColSize(compareModeColDefs.providedElsewhere)" ng-bind="providedElsewhereLabel" style="text-align: center">                        
@@ -159,7 +159,7 @@
 
                 <div class="row row-alternate compare-form-row" ng-repeat="prStDe in currentStage.programStageDataElements" ng-if="currentEvent.eventDate && !isHidden(prStDe.dataElement.id, currentEvent)">
                     <div ng-class="getCompareModeColSize(compareModeColDefs.header)" class="compare-form-extra-padding">
-                        <span ng-bind="prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name"></span>
+                        <span ng-bind="prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName"></span>
                         <span ng-if="prStDe.compulsory" class="required">*</span>
                         <span class="hideInPrint">
                             <a ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}" ng-init="showHelpText[prStDe.dataElement.id] = false;" ng-click="showHelpText[prStDe.dataElement.id] = !showHelpText[prStDe.dataElement.id]">
@@ -250,7 +250,7 @@
                             </div>   
                         </div>                        
                         <div style="float:right" class="hideInPrint compare-form-extra-padding mouse-pointer">
-                            <d2-audit dataelement-id="{{prStDe.dataElement.id}}" dataelement-name="{{prStDe.dataElement.name}}" current-event="{{currentEvent.event}}"></d2-audit>
+                            <d2-audit dataelement-id="{{prStDe.dataElement.id}}" dataelement-name="{{prStDe.dataElement.displayName}}" current-event="{{currentEvent.event}}"></d2-audit>
                         </div>                        
                     </div>
                     <div ng-if="allowProvidedElsewhereExists[currentStage.id]" ng-class="getCompareModeColSize(compareModeColDefs.providedElsewhere)" style="text-align: center">                        
@@ -271,10 +271,10 @@
 
                 <div ng-if='currentStage.programStageSections && currentStage.programStageSections.length > 0 && currentEvent.eventDate'>
                     <accordion close-others='false'>
-                        <accordion-group heading="{{section.name}}" is-open="section.open" ng-repeat='section in currentStage.programStageSections' ng-init="sectionNr = $index + 1" ng-if="!hiddenSections[currentEvent.event][section.id]">
+                        <accordion-group heading="{{section.displayName}}" is-open="section.open" ng-repeat='section in currentStage.programStageSections' ng-init="sectionNr = $index + 1" ng-if="!hiddenSections[currentEvent.event][section.id]">
 
                             <div class="vertical-spacing" ng-if="!section.programStageDataElements || section.programStageDataElements.length === 0">
-                                <div class="alert alert-warning">{{'section'| translate}} {{section.name}} {{'has_no_dataelements'| translate}}</div>
+                                <div class="alert alert-warning">{{'section'| translate}} {{section.displayName}} {{'has_no_dataelements'| translate}}</div>
                             </div>
 
                             <div ng-if="section.programStageDataElements && section.programStageDataElements.length > 0">
@@ -285,7 +285,7 @@
                                     <div ng-class="getCompareModeColSize(compareModeColDefs.otherEvents)" ng-if="otherStageEvents.length > 0">
                                         <div>                    
                                             <div ng-class="getCompareModeColSize(compareModeColDefs.otherEvent)" ng-repeat="otherEvent in otherStageEvents" class="other-events-alignment">
-                                                {{currentStage.name}} {{otherStageEventIndexes[$index].position + 1}}
+                                                {{currentStage.displayName}} {{otherStageEventIndexes[$index].position + 1}}
                                             </div>                    
                                        </div>
                                     </div>
@@ -294,7 +294,7 @@
                                             {{'current' | translate}}
                                         </span>  
                                         <span ng-if="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed">                    
-                                            {{currentStage.name}} {{currentStageEventNumber()}}
+                                            {{currentStage.displayName}} {{currentStageEventNumber()}}
                                         </span>                        
                                     </div>
                                     <div ng-if="allowProvidedElsewhereExists[currentStage.id]" ng-class="getCompareModeColSize(compareModeColDefs.providedElsewhere)" ng-bind="providedElsewhereLabel" style="text-align: center">                        
@@ -303,7 +303,7 @@
                                 
                                 <div class="row row-alternate compare-form-row" ng-repeat="de in section.programStageDataElements" ng-if="!isHidden(de.dataElement.id, currentEvent)">
                                     <div ng-class="getCompareModeColSize(compareModeColDefs.header)" class="compare-form-extra-padding">
-                                        <span ng-bind="prStDes[de.dataElement.id].dataElement.formName ? prStDes[de.dataElement.id].dataElement.formName : prStDes[de.dataElement.id].dataElement.name"></span>                                
+                                        <span ng-bind="prStDes[de.dataElement.id].dataElement.formName ? prStDes[de.dataElement.id].dataElement.formName : prStDes[de.dataElement.id].dataElement.displayName"></span>                                
                                         <span ng-if="prStDes[de.dataElement.id].compulsory" class="required">*</span>
                                         <span class="hideInPrint">
                                             <a ng-if="prStDes[de.dataElement.id].dataElement.description" Title="{{prStDes[de.dataElement.id].dataElement.description}}" ng-init="showHelpText[de.dataElement.id] = false;" ng-click="showHelpText[de.dataElement.id] = !showHelpText[de.dataElement.id]">
@@ -365,7 +365,7 @@
                                              style="float: left">                                                 
                                         </div>
                                         <div style="float:right" class="hideInPrint compare-form-extra-padding mouse-pointer">
-                                            <d2-audit dataelement-id="{{de.dataElement.id}}" dataelement-name="{{prStDes[de.dataElement.id].dataElement.name}}" current-event="{{currentEvent.event}}"></d2-audit>
+                                            <d2-audit dataelement-id="{{de.dataElement.id}}" dataelement-name="{{prStDes[de.dataElement.id].dataElement.displayName}}" current-event="{{currentEvent.event}}"></d2-audit>
                                         </div>
                                     </div>
                                     

@@ -183,10 +183,10 @@ var eventCaptureControllers = angular.module('eventCaptureControllers', [])
                 $scope.filterTypes = {};                               
                 $scope.newDhis2Event = {};
 
-                $scope.eventGridColumns.push({name: 'form_id', id: 'uid', valueType: 'TEXT', compulsory: false, filterWithRange: false, showFilter: false, show: false});
+                $scope.eventGridColumns.push({displayName: 'form_id', id: 'uid', valueType: 'TEXT', compulsory: false, filterWithRange: false, showFilter: false, show: false});
                 $scope.filterTypes['uid'] = 'TEXT';                
 
-                $scope.eventGridColumns.push({name: $scope.selectedProgramStage.reportDateDescription ? $scope.selectedProgramStage.reportDateDescription : $translate.instant('incident_date'), id: 'eventDate', valueType: 'DATE', filterWithRange: true, compulsory: false, showFilter: false, show: true});
+                $scope.eventGridColumns.push({displayName: $scope.selectedProgramStage.reportDateDescription ? $scope.selectedProgramStage.reportDateDescription : $translate.instant('incident_date'), id: 'eventDate', valueType: 'DATE', filterWithRange: true, compulsory: false, showFilter: false, show: true});
                 $scope.filterTypes['eventDate'] = 'DATE';
                 $scope.filterText['eventDate']= {};
 
@@ -197,7 +197,7 @@ var eventCaptureControllers = angular.module('eventCaptureControllers', [])
                     //generate grid headers using program stage data elements
                     //create a template for new event
                     //for date type dataelements, filtering is based on start and end dates
-                    $scope.eventGridColumns.push({name: prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name, 
+                    $scope.eventGridColumns.push({displayName: prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName, 
                                                   id: prStDe.dataElement.id, 
                                                   valueType: prStDe.dataElement.valueType, 
                                                   compulsory: prStDe.compulsory, 
@@ -335,11 +335,11 @@ var eventCaptureControllers = angular.module('eventCaptureControllers', [])
 
                                 if($scope.prStDes[dataValue.dataElement].dataElement.valueType === 'FILE_RESOURCE'){
                                     FileService.get(val).then(function(response){
-                                        if(response && response.name){
+                                        if(response && response.displayName){
                                             if(!$scope.fileNames[event.event]){
                                                 $scope.fileNames[event.event] = [];
                                             } 
-                                            $scope.fileNames[event.event][dataValue.dataElement] = response.name;
+                                            $scope.fileNames[event.event][dataValue.dataElement] = response.displayName;
                                         }
                                     });
                                 }
@@ -362,11 +362,11 @@ var eventCaptureControllers = angular.module('eventCaptureControllers', [])
                     $scope.dhis2Events = data.events; 
                     
                     if($scope.noteExists && !GridColumnService.columnExists($scope.eventGridColumns, 'comment')){
-                        $scope.eventGridColumns.push({name: 'comment', id: 'comment', type: 'TEXT', filterWithRange: false, compulsory: false, showFilter: false, show: true});
+                        $scope.eventGridColumns.push({displayName: 'comment', id: 'comment', type: 'TEXT', filterWithRange: false, compulsory: false, showFilter: false, show: true});
                     }
                     
                     if(!$scope.sortHeader.id){
-                        $scope.sortEventGrid({name: $scope.selectedProgramStage.reportDateDescription ? $scope.selectedProgramStage.reportDateDescription : 'incident_date', id: 'eventDate', type: 'DATE', compulsory: false, showFilter: false, show: true});
+                        $scope.sortEventGrid({displayName: $scope.selectedProgramStage.reportDateDescription ? $scope.selectedProgramStage.reportDateDescription : 'incident_date', id: 'eventDate', type: 'DATE', compulsory: false, showFilter: false, show: true});
                     }
                 }
                 

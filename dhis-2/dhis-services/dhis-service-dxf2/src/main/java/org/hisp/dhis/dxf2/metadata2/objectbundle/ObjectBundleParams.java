@@ -29,9 +29,12 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle;
  */
 
 import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.importexport.ImportStrategy;
 import org.hisp.dhis.preheat.PreheatIdentifier;
 import org.hisp.dhis.preheat.PreheatMode;
 import org.hisp.dhis.preheat.PreheatParams;
+import org.hisp.dhis.user.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,16 +46,33 @@ import java.util.Map;
  */
 public class ObjectBundleParams
 {
+    private User user;
+
     private ObjectBundleMode objectBundleMode = ObjectBundleMode.VALIDATE;
 
     private PreheatIdentifier preheatIdentifier = PreheatIdentifier.UID;
 
     private PreheatMode preheatMode = PreheatMode.REFERENCE;
 
+    private ImportStrategy importMode = ImportStrategy.CREATE_AND_UPDATE;
+
+    private MergeMode mergeMode = MergeMode.MERGE;
+
     private Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> objects = new HashMap<>();
 
     public ObjectBundleParams()
     {
+
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    public void setUser( User user )
+    {
+        this.user = user;
     }
 
     public ObjectBundleMode getObjectBundleMode()
@@ -85,6 +105,26 @@ public class ObjectBundleParams
     public void setPreheatMode( PreheatMode preheatMode )
     {
         this.preheatMode = preheatMode;
+    }
+
+    public ImportStrategy getImportMode()
+    {
+        return importMode;
+    }
+
+    public void setImportMode( ImportStrategy importMode )
+    {
+        this.importMode = importMode;
+    }
+
+    public MergeMode getMergeMode()
+    {
+        return mergeMode;
+    }
+
+    public void setMergeMode( MergeMode mergeMode )
+    {
+        this.mergeMode = mergeMode;
     }
 
     public Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> getObjects()

@@ -29,9 +29,14 @@ package org.hisp.dhis.preheat;
  */
 
 import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.dataelement.DataElementCategory;
+import org.hisp.dhis.dataelement.DataElementCategoryCombo;
+import org.hisp.dhis.dataelement.DataElementCategoryOption;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +45,8 @@ import java.util.Map;
 public class Preheat
 {
     private Map<PreheatIdentifier, Map<Class<? extends IdentifiableObject>, Map<String, IdentifiableObject>>> map = new HashMap<>();
+
+    private Map<Class<? extends IdentifiableObject>, IdentifiableObject> defaults = new HashMap<>();
 
     public Preheat()
     {
@@ -54,6 +61,24 @@ public class Preheat
         }
 
         return (T) map.get( identifier ).get( klass ).get( key );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public <T extends IdentifiableObject> List<T> getAll( PreheatIdentifier identifier, List<T> keys )
+    {
+        List<T> objects = new ArrayList<>();
+
+        for ( T key : keys )
+        {
+            IdentifiableObject identifiableObject = get( identifier, key );
+
+            if ( identifiableObject != null )
+            {
+                objects.add( (T) identifiableObject );
+            }
+        }
+
+        return objects;
     }
 
     public <T extends IdentifiableObject> T get( PreheatIdentifier identifier, T object )
@@ -101,12 +126,26 @@ public class Preheat
     public <T extends IdentifiableObject> Preheat put( PreheatIdentifier identifier, T object )
     {
         if ( object == null ) return this;
-        if ( !map.containsKey( identifier ) ) map.put( identifier, new HashMap<>() );
-        if ( !map.get( identifier ).containsKey( object.getClass() ) ) map.get( identifier ).put( object.getClass(), new HashMap<>() );
 
-        Map<String, IdentifiableObject> identifierMap = map.get( identifier ).get( object.getClass() );
-        String key = identifier.getIdentifier( object );
-        identifierMap.put( key, object );
+        if ( PreheatIdentifier.UID == identifier || PreheatIdentifier.AUTO == identifier )
+        {
+            if ( !map.containsKey( PreheatIdentifier.UID ) ) map.put( PreheatIdentifier.UID, new HashMap<>() );
+            if ( !map.get( PreheatIdentifier.UID ).containsKey( object.getClass() ) ) map.get( PreheatIdentifier.UID ).put( object.getClass(), new HashMap<>() );
+
+            Map<String, IdentifiableObject> identifierMap = map.get( PreheatIdentifier.UID ).get( object.getClass() );
+            String key = PreheatIdentifier.UID.getIdentifier( object );
+            identifierMap.put( key, object );
+        }
+
+        if ( PreheatIdentifier.CODE == identifier || PreheatIdentifier.AUTO == identifier )
+        {
+            if ( !map.containsKey( PreheatIdentifier.CODE ) ) map.put( PreheatIdentifier.CODE, new HashMap<>() );
+            if ( !map.get( PreheatIdentifier.CODE ).containsKey( object.getClass() ) ) map.get( PreheatIdentifier.CODE ).put( object.getClass(), new HashMap<>() );
+
+            Map<String, IdentifiableObject> identifierMap = map.get( PreheatIdentifier.CODE ).get( object.getClass() );
+            String key = PreheatIdentifier.CODE.getIdentifier( object );
+            identifierMap.put( key, object );
+        }
 
         return this;
     }
@@ -131,6 +170,33 @@ public class Preheat
         return this;
     }
 
+    public Preheat remove( PreheatIdentifier identifier, IdentifiableObject object )
+    {
+        Class<? extends IdentifiableObject> klass = object.getClass();
+
+        if ( PreheatIdentifier.UID == identifier || PreheatIdentifier.AUTO == identifier )
+        {
+            String key = PreheatIdentifier.UID.getIdentifier( object );
+
+            if ( containsKey( PreheatIdentifier.UID, klass, key ) )
+            {
+                map.get( PreheatIdentifier.UID ).get( klass ).remove( key );
+            }
+        }
+
+        if ( PreheatIdentifier.CODE == identifier || PreheatIdentifier.AUTO == identifier )
+        {
+            String key = PreheatIdentifier.CODE.getIdentifier( object );
+
+            if ( containsKey( PreheatIdentifier.CODE, klass, key ) )
+            {
+                map.get( PreheatIdentifier.CODE ).get( klass ).remove( key );
+            }
+        }
+
+        return this;
+    }
+
     public Preheat remove( PreheatIdentifier identifier, Class<? extends IdentifiableObject> klass, Collection<String> keys )
     {
         for ( String key : keys )
@@ -139,5 +205,31 @@ public class Preheat
         }
 
         return this;
+    }
+
+    public Map<PreheatIdentifier, Map<Class<? extends IdentifiableObject>, Map<String, IdentifiableObject>>> getMap()
+    {
+        return map;
+    }
+
+    public Map<Class<? extends IdentifiableObject>, IdentifiableObject> getDefaults()
+    {
+        return defaults;
+    }
+
+    public void setDefaults( Map<Class<? extends IdentifiableObject>, IdentifiableObject> defaults )
+    {
+        this.defaults = defaults;
+    }
+
+    public static boolean isDefaultClass( IdentifiableObject object )
+    {
+        return (DataElementCategory.class.isInstance( object ) || DataElementCategoryOption.class.isInstance( object )
+            || DataElementCategoryCombo.class.isInstance( object ));
+    }
+
+    public static boolean isDefault( IdentifiableObject object )
+    {
+        return isDefaultClass( object ) && "default".equals( object.getName() );
     }
 }

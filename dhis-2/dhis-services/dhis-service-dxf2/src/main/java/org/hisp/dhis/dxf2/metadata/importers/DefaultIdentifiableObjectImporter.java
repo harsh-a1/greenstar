@@ -50,7 +50,6 @@ import org.hisp.dhis.dataelement.DataElementCategoryDimension;
 import org.hisp.dhis.dataelement.DataElementCategoryOption;
 import org.hisp.dhis.dataelement.DataElementOperand;
 import org.hisp.dhis.dataelement.DataElementOperandService;
-import org.hisp.dhis.dataentryform.DataEntryForm;
 import org.hisp.dhis.dataentryform.DataEntryFormService;
 import org.hisp.dhis.dxf2.common.ImportOptions;
 import org.hisp.dhis.dxf2.importsummary.ImportConflict;
@@ -59,7 +58,7 @@ import org.hisp.dhis.dxf2.metadata.Importer;
 import org.hisp.dhis.dxf2.metadata.ObjectBridge;
 import org.hisp.dhis.dxf2.metadata.handlers.ObjectHandler;
 import org.hisp.dhis.dxf2.metadata.handlers.ObjectHandlerUtils;
-import org.hisp.dhis.dxf2.schema.SchemaValidator;
+import org.hisp.dhis.schema.validation.SchemaValidator;
 import org.hisp.dhis.eventchart.EventChart;
 import org.hisp.dhis.eventreport.EventReport;
 import org.hisp.dhis.expression.Expression;
@@ -81,7 +80,7 @@ import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserCredentials;
 import org.hisp.dhis.user.UserService;
 import org.hisp.dhis.validation.ValidationRule;
-import org.hisp.dhis.validation.ValidationViolation;
+import org.hisp.dhis.schema.validation.ValidationViolation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;
@@ -454,13 +453,13 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
         if ( !options.isSharing() )
         {
             User persistedObjectUser = persistedObject.getUser();
-            persistedObject.mergeWith( object, options.getMergeStrategy() );
+            persistedObject.mergeWith( object, options.getMergeMode() );
             // mergeService.merge( persistedObject, object, options.getMergeStrategy() );
             persistedObject.setUser( persistedObjectUser );
         }
         else
         {
-            persistedObject.mergeWith( object, options.getMergeStrategy() );
+            persistedObject.mergeWith( object, options.getMergeMode() );
             // mergeService.merge( persistedObject, object, options.getMergeStrategy() );
             persistedObject.mergeSharingWith( object );
         }
@@ -486,7 +485,7 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
                     userService.encodeAndSetPassword( userCredentials, userCredentials.getPassword() );
                 }
 
-                ((User) persistedObject).getUserCredentials().mergeWith( userCredentials, options.getMergeStrategy() );
+                ((User) persistedObject).getUserCredentials().mergeWith( userCredentials, options.getMergeMode() );
                 // mergeService.merge( ((User) persistedObject).getUserCredentials(), userCredentials, options.getMergeStrategy() );
                 reattachFields( ((User) persistedObject).getUserCredentials(), fieldsUserCredentials, user );
                 reattachCollectionFields( ((User) persistedObject).getUserCredentials(), collectionFieldsUserCredentials, user );
@@ -949,8 +948,6 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
         private Expression leftSide;
         private Expression rightSide;
 
-        private DataEntryForm dataEntryForm;
-
         private Set<DataElementOperand> compulsoryDataElementOperands = new HashSet<>();
         private Set<DataElementOperand> greyedFields = new HashSet<>();
         private List<DataElementOperand> dataElementOperands = new ArrayList<>();
@@ -998,7 +995,6 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
             attributeValues = extractAttributeValues( object );
             leftSide = extractExpression( object, "leftSide" );
             rightSide = extractExpression( object, "rightSide" );
-            dataEntryForm = extractDataEntryForm( object, "dataEntryForm" );
             compulsoryDataElementOperands = Sets.newHashSet( extractDataElementOperands( object, "compulsoryDataElementOperands" ) );
             greyedFields = Sets.newHashSet( extractDataElementOperands( object, "greyedFields" ) );
             dataElementOperands = Lists.newArrayList( extractDataElementOperands( object, "dataElementOperands" ) );
@@ -1014,7 +1010,6 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
             {
                 deleteExpression( object, "leftSide" );
                 deleteExpression( object, "rightSide" );
-                deleteDataEntryForm( object, "dataEntryForm" );
 
                 if ( options.getImportStrategy().isDelete() )
                 {
@@ -1032,54 +1027,11 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
             saveAttributeValues( object, attributeValues );
             saveExpression( object, "leftSide", leftSide );
             saveExpression( object, "rightSide", rightSide );
-            saveDataEntryForm( object, "dataEntryForm", dataEntryForm );
             saveDataElementOperands( object, "compulsoryDataElementOperands", compulsoryDataElementOperands );
             saveDataElementOperands( object, "greyedFields", greyedFields );
             saveDataElementOperands( object, "dataElementOperands", dataElementOperands );
             saveCategoryDimensions( object, categoryDimensions );
             saveDataDimensionItems( object, dataDimensionItems );
-        }
-
-        private void saveDataEntryForm( T object, String fieldName, DataEntryForm dataEntryForm )
-        {
-            if ( dataEntryForm != null )
-            {
-                Map<Field, Collection<Object>> identifiableObjectCollections = detachCollectionFields( dataEntryForm );
-                reattachCollectionFields( dataEntryForm, identifiableObjectCollections, user );
-
-                dataEntryForm.setId( 0 );
-                dataEntryFormService.addDataEntryForm( dataEntryForm );
-
-                ReflectionUtils.invokeSetterMethod( fieldName, object, dataEntryForm );
-            }
-        }
-
-        private DataEntryForm extractDataEntryForm( T object, String fieldName )
-        {
-            DataEntryForm dataEntryForm = null;
-
-            if ( ReflectionUtils.findGetterMethod( fieldName, object ) != null )
-            {
-                dataEntryForm = ReflectionUtils.invokeGetterMethod( fieldName, object );
-
-                if ( dataEntryForm != null )
-                {
-                    ReflectionUtils.invokeSetterMethod( fieldName, object, new Object[]{ null } );
-                }
-            }
-
-            return dataEntryForm;
-        }
-
-        private void deleteDataEntryForm( T object, String fieldName )
-        {
-            DataEntryForm dataEntryForm = extractDataEntryForm( object, fieldName );
-
-            if ( dataEntryForm != null )
-            {
-                dataEntryFormService.deleteDataEntryForm( dataEntryForm );
-                sessionFactory.getCurrentSession().flush();
-            }
         }
 
         private Expression extractExpression( T object, String fieldName )

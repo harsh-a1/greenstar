@@ -109,6 +109,13 @@ public class SendScheduledMessageTask
         this.sendingMessage = sendingMessage;
     }
 
+    private Boolean sendNow;
+
+    public void setSendNow( Boolean sendNow )
+    {
+        this.sendNow = sendNow;
+    }
+
     private TaskId taskId;
 
     public void setTaskId( TaskId taskId )
@@ -128,9 +135,31 @@ public class SendScheduledMessageTask
         Clock clock = new Clock().startClock().logTime(
             "Aggregate process started, number of CPU cores: " + cpuCores + ", " + SystemUtils.getMemoryString() );
 
+        if ( sendNow )
+        {
+            clock.logTime( "Starting to prepare reminder messages" );
+            notifier.clear( taskId ).notify( taskId, "Start to prepare reminder messages" );
+
+            scheduleProgramStageInstanceMessage();
+            scheduleProgramInstanceMessage();
+
+            clock.logTime( "Preparing reminder messages completed" );
+            notifier.notify( taskId, INFO, "Preparing reminder messages completed", true );
+
+            clock.logTime( "Starting to send messages in outbound" );
+            notifier.notify( taskId, INFO, "Start to send messages in outbound", true );
+
+            sendMessage();
+
+            clock.logTime( "Sending messages in outbound completed" );
+            notifier.notify( taskId, INFO, "Sending messages in outbound completed", true );
+            
+            return;
+        }
+
         if ( sendingMessage )
         {
-            clock.logTime( "Start to send messages in outbound" );
+            clock.logTime( "Starting to send messages in outbound" );
             notifier.notify( taskId, INFO, "Start to send messages in outbound", true );
 
             sendMessage();
@@ -140,12 +169,12 @@ public class SendScheduledMessageTask
         }
         else
         {
-            clock.logTime( "Start to prepare reminder messages" );
+            clock.logTime( "Starting to prepare reminder messages" );
             notifier.clear( taskId ).notify( taskId, "Start to prepare reminder messages" );
 
             scheduleProgramStageInstanceMessage();
             scheduleProgramInstanceMessage();
-            
+
             clock.logTime( "Preparing reminder messages completed" );
             notifier.notify( taskId, INFO, "Preparing reminder messages completed", true );
         }
@@ -185,13 +214,13 @@ public class SendScheduledMessageTask
 
                 String sql = "INSERT INTO programstageinstance_outboundsms"
                     + "( programstageinstanceid, outboundsmsid, sort_order) VALUES " + "("
-                    + schedulingProgramObject.getProgramStageInstanceId() + ", " + outboundSms.getId() + ","
-                    + sortOrder + ") ";
+                    + schedulingProgramObject.getProgramStageInstanceId() + ", " + outboundSms.getId() + "," + sortOrder
+                    + ") ";
 
                 jdbcTemplate.execute( sql );
 
-                notifier.notify( taskId, "Reminder messages for event of " + outboundSms.getRecipients()
-                    + " is created " );
+                notifier.notify( taskId,
+                    "Reminder messages for event of " + outboundSms.getRecipients() + " is created " );
             }
             catch ( SmsServiceException e )
             {
@@ -204,7 +233,7 @@ public class SendScheduledMessageTask
 
     private void scheduleProgramInstanceMessage()
     {
-        notifier.notify( taskId, "Start to prepare reminder messages for enrollements" );
+        notifier.notify( taskId, "Start to prepare remigetScheduledTasksnder messages for enrollements" );
 
         Collection<SchedulingProgramObject> schedulingProgramObjects = programInstanceService.getScheduledMessages();
 
@@ -234,8 +263,8 @@ public class SendScheduledMessageTask
 
                 jdbcTemplate.execute( sql );
 
-                notifier.notify( taskId, "Reminder messages for enrollement of " + outboundSms.getRecipients()
-                    + " is created " );
+                notifier.notify( taskId,
+                    "Reminder messages for enrollement of " + outboundSms.getRecipients() + " is created " );
             }
             catch ( SmsServiceException e )
             {

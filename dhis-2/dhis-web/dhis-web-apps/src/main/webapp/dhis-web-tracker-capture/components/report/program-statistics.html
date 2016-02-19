@@ -18,15 +18,15 @@
     </div>
     
     <!--- selected org unit begins -->
-    <input type="text" selected-org-unit ng-model="selectedOrgUnit.name" ng-hide=true>
+    <input type="text" selected-org-unit ng-model="selectedOrgUnit.displayName" ng-hide=true>
     <!--- selected org unit ends  -->
     
 </div>
 
-<div id="mainPage" class="bordered-div">
+<div id="mainPage" class="bordered-div page">
     <h2>{{'program_statistics_report'| translate}}</h2>
     <form name="outerForm" novalidate>               
-        <div ng-include="'components/report/reportForm.html'"></div>
+        <div ng-include="'components/report/report-form.html'"></div>
     </form>    
     <img src="../images/ajax-loader-bar.gif" ng-if="!dataReady && reportStarted"/>
     <div ng-if="dataReady">

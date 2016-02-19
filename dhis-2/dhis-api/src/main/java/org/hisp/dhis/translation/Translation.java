@@ -35,7 +35,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 
 import java.util.Objects;
 
@@ -207,15 +207,15 @@ public class Translation
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             Translation translation = (Translation) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 objectUid = translation.getObjectUid();
                 className = translation.getClassName();
@@ -223,7 +223,7 @@ public class Translation
                 property = translation.getProperty();
                 value = translation.getValue();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 objectUid = translation.getObjectUid() == null ? objectUid : translation.getObjectUid();
                 className = translation.getClassName() == null ? className : translation.getClassName();

@@ -14,8 +14,6 @@
 
   <bean id="org.hisp.dhis.dxf2.csv.CsvImportService" class="org.hisp.dhis.dxf2.csv.DefaultCsvImportService" />
 
-  <bean id="org.hisp.dhis.dxf2.schema.SchemaValidator" class="org.hisp.dhis.dxf2.schema.DefaultSchemaValidator" />
-
   <bean id="org.hisp.dhis.dxf2.metadata.ExportService" class="org.hisp.dhis.dxf2.metadata.DefaultExportService" scope="prototype" />
 
   <bean id="org.hisp.dhis.dxf2.metadata.ImportService" class="org.hisp.dhis.dxf2.metadata.DefaultImportService" scope="prototype">
@@ -139,6 +137,10 @@
 
   <bean id="dataSetImporter" class="org.hisp.dhis.dxf2.metadata.importers.DefaultIdentifiableObjectImporter" scope="prototype">
     <constructor-arg name="importerClass" type="java.lang.Class" value="org.hisp.dhis.dataset.DataSet" />
+  </bean>
+
+  <bean id="dataEntryFormImporter" class="org.hisp.dhis.dxf2.metadata.importers.DefaultIdentifiableObjectImporter" scope="prototype">
+    <constructor-arg name="importerClass" type="java.lang.Class" value="org.hisp.dhis.dataentryform.DataEntryForm" />
   </bean>
 
   <bean id="dataApprovalLevelImporter" class="org.hisp.dhis.dxf2.metadata.importers.DefaultIdentifiableObjectImporter" scope="prototype">

@@ -27,7 +27,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
                 TEIGridService,
                 TEIService,
                 EventReportService,
-                ModalService,$q) {  
+                $q) {  
     $scope.maxOptionSize = 30;
     $scope.eventsTodayFilters = [{name: $translate.instant('events_today_all'), value: 'all'},{name: $translate.instant('events_today_completeoractive'),value: 'completedOrActive', status:['COMPLETED', 'ACTIVE']},{name: $translate.instant('events_today_skipped') , value: 'skipped', status:['SKIPPED']},{name: $translate.instant('events_today_scheduled'), value: 'scheduled', status:['SCHEDULE']}];
     $scope.selectedEventsTodayFilter = $scope.eventsTodayFilters[0];
@@ -47,7 +47,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
     
     //Searching
     $scope.showSearchDiv = false;
-    $scope.searchText = null;
+    $scope.model = {searchText: null};
     $scope.searchFilterExists = false;   
     $scope.defaultOperators = OperatorFactory.defaultOperators;
     $scope.boolOperators = OperatorFactory.boolOperators;
@@ -83,7 +83,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
             SessionStorageService.set('SELECTED_OU', $scope.selectedOrgUnit);
             
             $scope.trackedEntityList = null;            
-            $scope.searchText = null;
+            $scope.model.searchText = null;
             
             $scope.optionSets = CurrentSelection.getOptionSets();
             
@@ -182,7 +182,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
         resetParams();
         $scope.selectedProgram = program;
         $scope.trackedEntityList = null;
-        $scope.searchText = null;
+        $scope.model.searchText = null;
         $scope.processAttributes();              
     };
     
@@ -248,8 +248,8 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
         //check search mode
         if( $scope.selectedSearchMode === $scope.searchMode.freeText ){
             
-            if($scope.searchText){
-                $scope.queryUrl = 'query=LIKE:' + $scope.searchText;
+            if($scope.model.searchText){
+                $scope.queryUrl = 'query=LIKE:' + $scope.model.searchText;
             }
             else{
                 if(!$scope.selectedProgram || !$scope.selectedProgram.displayFrontPageList){
@@ -265,7 +265,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
         
         if( $scope.selectedSearchMode === $scope.searchMode.attributeBased ){
             
-            $scope.searchText = null;
+            $scope.model.searchText = null;
             
             $scope.attributeUrl = EntityQueryFactory.getAttributesQuery($scope.attributes, $scope.enrollment);
             
@@ -279,7 +279,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
         }
         
         if( $scope.selectedSearchMode === $scope.searchMode.listAll ){
-            $scope.searchText = null;            
+            $scope.model.searchText = null;            
             $scope.attributes = EntityQueryFactory.resetAttributesQuery($scope.attributes, $scope.enrollment);
             $scope.searchingOrgUnit = $scope.selectedSearchingOrgUnit && $scope.selectedSearchingOrgUnit.id ? $scope.selectedSearchingOrgUnit : $scope.selectedOrgUnit;
         }
@@ -365,7 +365,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
                 $scope.doSearch = true;
 
                 if(!$scope.sortColumn.id){                                      
-                    $scope.sortGrid({id: 'created', name: 'registration_date', valueType: 'date', displayInListNoProgram: false, showFilter: false, show: false});
+                    $scope.sortGrid({id: 'created', displayName: 'registration_date', valueType: 'date', displayInListNoProgram: false, showFilter: false, show: false});
                 }
             });         
             

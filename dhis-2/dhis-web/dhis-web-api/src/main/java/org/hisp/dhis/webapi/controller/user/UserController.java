@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.common.CodeGenerator;
 import org.hisp.dhis.common.IdentifiableObjectUtils;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.Pager;
 import org.hisp.dhis.dxf2.common.ImportOptions;
 import org.hisp.dhis.dxf2.importsummary.ImportStatus;
@@ -343,12 +343,12 @@ public class UserController
         }
 
         User userReplica = new User();
-        userReplica.mergeWith( existingUser, MergeStrategy.MERGE_IF_NOT_NULL );
+        userReplica.mergeWith( existingUser, MergeMode.MERGE_IF_NOT_NULL );
         userReplica.setUid( CodeGenerator.generateCode() );
         userReplica.setCreated( new Date() );
 
         UserCredentials credentialsReplica = new UserCredentials();
-        credentialsReplica.mergeWith( existingUser.getUserCredentials(), MergeStrategy.MERGE_IF_NOT_NULL );
+        credentialsReplica.mergeWith( existingUser.getUserCredentials(), MergeMode.MERGE_IF_NOT_NULL );
 
         credentialsReplica.setUsername( username );
         userService.encodeAndSetPassword( credentialsReplica, password );
@@ -509,7 +509,7 @@ public class UserController
 
         ImportOptions importOptions = new ImportOptions();
         importOptions.setStrategy( ImportStrategy.CREATE );
-        importOptions.setMergeStrategy( MergeStrategy.MERGE );
+        importOptions.setMergeMode( MergeMode.MERGE );
         ImportTypeSummary importTypeSummary = importService.importObject( currentUserService.getCurrentUser().getUid(), user, importOptions );
 
         if ( importTypeSummary.isStatus( ImportStatus.SUCCESS ) && importTypeSummary.getImportCount().getImported() == 1 )

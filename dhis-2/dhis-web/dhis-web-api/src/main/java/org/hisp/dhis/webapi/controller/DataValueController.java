@@ -267,7 +267,15 @@ public class DataValueController
                 fileResourceService.deleteFileResource( dataValue.getValue() );
             }
 
-            dataValue.setValue( StringUtils.trimToNull( value ) );
+            // -----------------------------------------------------------------
+            // Value and comment are sent individually, so null checks must be 
+            // made for each. Empty string is sent for clearing a value.
+            // -----------------------------------------------------------------
+            
+            if ( value != null )
+            {
+                dataValue.setValue( StringUtils.trimToNull( value ) );
+            }
 
             if ( comment != null )
             {

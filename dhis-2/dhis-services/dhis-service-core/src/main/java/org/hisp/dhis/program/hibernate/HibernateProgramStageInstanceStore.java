@@ -112,7 +112,7 @@ public class HibernateProgramStageInstanceStore
         sql += " UNION ( " + sendMessageToUsersSql() + " ) ";
 
         sql += " UNION ( " + sendMessageToUserGroupsSql() + " ) ";
-
+        
         SqlRowSet rs = jdbcTemplate.queryForRowSet( sql );
 
         Collection<SchedulingProgramObject> schedulingProgramObjects = new HashSet<>();
@@ -153,7 +153,7 @@ public class HibernateProgramStageInstanceStore
 
             SchedulingProgramObject schedulingProgramObject = new SchedulingProgramObject();
             schedulingProgramObject.setProgramStageInstanceId( programstageinstanceid );
-            schedulingProgramObject.setPhoneNumber( rs.getString( "phonenumber" ) );
+            schedulingProgramObject.setPhoneNumber( rs.getString( "PHONE_NUMBER" ) );
             schedulingProgramObject.setMessage( message );
 
             schedulingProgramObjects.add( schedulingProgramObject );
@@ -273,7 +273,7 @@ public class HibernateProgramStageInstanceStore
 
     private String sendMessageToTrackedEntityInstanceSql()
     {
-        return "select psi.programstageinstanceid, pav.value as phonenumber, prm.templatemessage, org.name as orgunitName "
+        return "select psi.programstageinstanceid, pav.value as PHONE_NUMBER, prm.templatemessage, org.name as orgunitName "
             + ",pg.name as programName, ps.name as programStageName, psi.duedate,(DATE(now()) - DATE(psi.duedate) ) as days_since_due_date "
             + "from trackedentityinstance p INNER JOIN programinstance pi "
             + "     ON p.trackedentityinstanceid=pi.trackedentityinstanceid "
@@ -295,7 +295,7 @@ public class HibernateProgramStageInstanceStore
             + EventStatus.ACTIVE.name()
             + "'     and prm.templatemessage is not NULL and prm.templatemessage != '' "
             + "     and pg.type='" + ProgramType.WITH_REGISTRATION.name() + "' and prm.daysallowedsendmessage is not null  "
-            + "     and psi.executiondate is null and pa.valuetype='phoneNumber' "
+            + "     and psi.executiondate is null and pa.valuetype='PHONE_NUMBER' "
             + "     and (  DATE(now()) - DATE(psi.duedate) ) = prm.daysallowedsendmessage "
             + "     and prm.whentosend is null and prm.sendto = " + TrackedEntityInstanceReminder.SEND_TO_TRACKED_ENTITY_INSTANCE;
     }

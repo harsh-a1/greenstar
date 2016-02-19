@@ -109,8 +109,12 @@ public class DefaultMetadataExportService implements MetadataExportService
 
             query.setDefaultOrder();
             List<? extends IdentifiableObject> objects = queryService.query( query );
-            log.info( "Exported " + objects.size() + " objects of type " + klass.getSimpleName() );
-            metadata.put( klass, objects );
+
+            if ( !objects.isEmpty() )
+            {
+                log.info( "Exported " + objects.size() + " objects of type " + klass.getSimpleName() );
+                metadata.put( klass, objects );
+            }
         }
 
         log.info( "Export done at " + new Date() );

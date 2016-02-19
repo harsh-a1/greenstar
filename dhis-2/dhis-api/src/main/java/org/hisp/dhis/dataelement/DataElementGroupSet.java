@@ -43,7 +43,7 @@ import org.hisp.dhis.common.DimensionType;
 import org.hisp.dhis.common.DimensionalItemObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.comparator.IdentifiableObjectNameComparator;
 import org.hisp.dhis.common.view.DetailedView;
@@ -257,20 +257,20 @@ public class DataElementGroupSet
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mode );
 
         if ( other.getClass().isInstance( this ) )
         {
             DataElementGroupSet dataElementGroupSet = (DataElementGroupSet) other;
 
-            if ( strategy.isReplace() )
+            if ( mode.isReplace() )
             {
                 description = dataElementGroupSet.getDescription();
                 compulsory = dataElementGroupSet.isCompulsory();
             }
-            else if ( strategy.isMerge() )
+            else if ( mode.isMerge() )
             {
                 description = dataElementGroupSet.getDescription() == null ? description : dataElementGroupSet.getDescription();
                 compulsory = dataElementGroupSet.isCompulsory() == null ? compulsory : dataElementGroupSet.isCompulsory();

@@ -164,6 +164,7 @@ public abstract class AbstractEnrollmentService
         if ( programInstance.getOrganisationUnit() != null )
         {
             enrollment.setOrgUnit( programInstance.getOrganisationUnit().getUid() );
+            enrollment.setOrgUnitName( programInstance.getOrganisationUnit().getName() );
         }
 
         enrollment.setCreated( programInstance.getCreated() );

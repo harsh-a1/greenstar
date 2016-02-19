@@ -38,6 +38,7 @@ import java.util.List;
 public enum Preset
 {
     ID( "id", Lists.newArrayList( "id" ) ),
+    CODE( "code", Lists.newArrayList( "code" ) ),
     ID_NAME( "idName", Lists.newArrayList( "id", "displayName" ) ),
     ALL( "all", Lists.newArrayList( "*" ) ),
     IDENTIFIABLE( "identifiable", Lists.newArrayList( "id", "name", "code", "created", "lastUpdated", "href" ) ),

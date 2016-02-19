@@ -30,7 +30,7 @@ package org.hisp.dhis.attribute;
 
 import org.hisp.dhis.attribute.exception.NonUniqueAttributeValueException;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.validation.ValidationViolation;
+import org.hisp.dhis.schema.validation.ValidationViolation;
 
 import java.util.List;
 import java.util.Set;

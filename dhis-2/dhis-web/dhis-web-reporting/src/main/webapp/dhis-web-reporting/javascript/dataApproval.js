@@ -99,7 +99,7 @@ dhis2.appr.setItemsDialog = function()
 	if ( !ui.ds || !ui.pe || !ui.ou ) {
 		return false;
 	}
-		
+	
 	var cc = dhis2.appr.dataSets[ui.ds].categoryCombo,
 		ccUrl = "../api/categoryCombos/" + cc.id + ".json?fields=id,displayName,categoryOptionCombos[id,displayName]",
 		apUrl = "../api/dataApprovals/categoryOptionCombos?ds=" + ui.ds + "&pe=" + ui.pe + "&ou=" + ui.ou,
@@ -291,7 +291,7 @@ dhis2.appr.getDataReport = function()
  * Gets the state of the user interface selections.
  */
 dhis2.appr.getUiState = function()
-{		
+{
 	var ui = {
 		ds: $( "#dataSetId" ).val(),
 		pe: $( "#periodId" ).val(),
@@ -318,8 +318,10 @@ dhis2.appr.getUiState = function()
 /**
  * Gets an approval payload object based on the given state.
  * @param ui the ui state.
+ * @param permissionProperty name of permission property which must be
+ *        true for the approval record to be included.
  */
-dhis2.appr.getApprovalPayload = function( ui ) {
+dhis2.appr.getApprovalPayload = function( ui, permissionProperty ) {
 	
 	var json = {
 		ds: [ui.ds],
@@ -328,10 +330,13 @@ dhis2.appr.getApprovalPayload = function( ui ) {
 	};
 	
 	$.each( ui.approvals, function( inx, ap ) {
-		json.approvals.push( {
-			ou: ap.ou,
-			aoc: ap.aoc
-		} );
+		
+		if ( ap.permissions && ap.permissions[permissionProperty] ) {
+			json.approvals.push( {
+				ou: ap.ou,
+				aoc: ap.aoc
+			} );
+		}
 	} );
 	
 	return json;
@@ -471,6 +476,13 @@ dhis2.appr.setAttributeOptionComboApprovalState = function()
 	}	
 };
 
+dhis2.appr.resetApprovalOptions = function()
+{
+	$( ".approveButton" ).hide();
+	$( "#approvalNotification" ).html( i18n_done + ". " + i18n_please_make_selection );
+	dhis2.appr.clearItemsDialog();
+}
+
 /**
  * Sets the state of the approval buttons and notification for regular
  * data sets.
@@ -492,7 +504,7 @@ dhis2.appr.setRegularApprovalState = function( ui )
 		dhis2.appr.permissions = json;
 		
 	    $( ".approveButton" ).hide();
-	
+
 	    switch ( json.state ) {
 	        case "UNAPPROVABLE":
 		        $( "#approvalNotification" ).html( i18n_approval_not_relevant );
@@ -610,7 +622,7 @@ dhis2.appr.approveData = function()
 	
 	var ui = dhis2.appr.getUiState(),
 		ds = dhis2.appr.dataSets[ui.ds],
-		json = dhis2.appr.getApprovalPayload( ui );
+		json = dhis2.appr.getApprovalPayload( ui, "mayApprove" );
 	
 	if ( ds.hasCategoryCombo ) {
 		$.ajax( {
@@ -619,7 +631,7 @@ dhis2.appr.approveData = function()
 			contentType: "application/json",
 			data: JSON.stringify( json ),
 			success: function() {
-				dhis2.appr.setApprovalState();
+				dhis2.appr.resetApprovalOptions();
 			},
 			error: function( xhr, status, error ) {
 				alert( xhr.responseText );
@@ -651,7 +663,7 @@ dhis2.appr.unapproveData = function()
 
 	var ui = dhis2.appr.getUiState(),
 		ds = dhis2.appr.dataSets[ui.ds],
-		json = dhis2.appr.getApprovalPayload( ui );
+		json = dhis2.appr.getApprovalPayload( ui, "mayUnapprove" );
 	
 	if ( ds.hasCategoryCombo ) {
 		$.ajax( {
@@ -660,7 +672,7 @@ dhis2.appr.unapproveData = function()
 			contentType: "application/json",
 			data: JSON.stringify( json ),
 			success: function() {
-				dhis2.appr.setApprovalState();
+				dhis2.appr.resetApprovalOptions();
 			},
 			error: function( xhr, status, error ) {
 				alert( xhr.responseText );
@@ -692,7 +704,7 @@ dhis2.appr.acceptData = function()
 
 	var ui = dhis2.appr.getUiState(),
 		ds = dhis2.appr.dataSets[ui.ds],
-		json = dhis2.appr.getApprovalPayload( ui );
+		json = dhis2.appr.getApprovalPayload( ui, "mayAccept" );
 	
 	if ( ds.hasCategoryCombo ) {
 		$.ajax( {
@@ -701,7 +713,7 @@ dhis2.appr.acceptData = function()
 			contentType: "application/json",
 			data: JSON.stringify( json ),
 			success: function() {
-				dhis2.appr.setApprovalState();
+				dhis2.appr.resetApprovalOptions();
 			},
 			error: function( xhr, status, error ) {
 				alert( xhr.responseText );
@@ -733,7 +745,7 @@ dhis2.appr.unacceptData = function()
 
 	var ui = dhis2.appr.getUiState(),
 		ds = dhis2.appr.dataSets[ui.ds],
-		json = dhis2.appr.getApprovalPayload( ui );
+		json = dhis2.appr.getApprovalPayload( ui, "mayUnaccept" );
 		
 	if ( ds.hasCategoryCombo ) {
 		$.ajax( {
@@ -742,7 +754,7 @@ dhis2.appr.unacceptData = function()
 			contentType: "application/json",
 			data: JSON.stringify( json ),
 			success: function() {
-				dhis2.appr.setApprovalState();
+				dhis2.appr.resetApprovalOptions();
 			},
 			error: function( xhr, status, error ) {
 				alert( xhr.responseText );

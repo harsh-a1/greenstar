@@ -38,7 +38,7 @@ import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
@@ -233,23 +233,23 @@ public class ProgramTrackedEntityAttribute
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             ProgramTrackedEntityAttribute programTrackedEntityAttribute = (ProgramTrackedEntityAttribute) other;
             displayInList = programTrackedEntityAttribute.isDisplayInList();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 program = programTrackedEntityAttribute.getProgram();
                 attribute = programTrackedEntityAttribute.getAttribute();
                 mandatory = programTrackedEntityAttribute.isMandatory();
                 allowFutureDate = programTrackedEntityAttribute.getAllowFutureDate();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 program = programTrackedEntityAttribute.getProgram() == null ? program : programTrackedEntityAttribute.getProgram();
                 attribute = programTrackedEntityAttribute.getAttribute() == null ? attribute : programTrackedEntityAttribute.getAttribute();

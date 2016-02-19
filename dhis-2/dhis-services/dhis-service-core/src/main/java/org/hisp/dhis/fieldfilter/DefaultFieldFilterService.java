@@ -32,6 +32,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.hisp.dhis.dataelement.DataElementOperand;
 import org.hisp.dhis.node.AbstractNode;
 import org.hisp.dhis.node.Node;
 import org.hisp.dhis.node.NodePropertyConverter;
@@ -229,7 +230,7 @@ public class DefaultFieldFilterService implements FieldFilterService
                     child = new CollectionNode( property.getCollectionName() );
                     child.setNamespace( property.getNamespace() );
 
-                    if ( property.isIdentifiableObject() )
+                    if ( property.isIdentifiableObject() && !DataElementOperand.class.isAssignableFrom( property.getItemKlass() ) )
                     {
                         for ( Object collectionObject : collection )
                         {
@@ -262,7 +263,7 @@ public class DefaultFieldFilterService implements FieldFilterService
                         }
                     }
                 }
-                else if ( property.isIdentifiableObject() )
+                else if ( property.isIdentifiableObject() && !DataElementOperand.class.isAssignableFrom( property.getKlass() ) )
                 {
                     child = getProperties( property, returnValue, fields );
                 }

@@ -27,7 +27,7 @@
                         <ul class="dropdown-menu pull-right" role="menu">
                             <li><a href ng-click="showHideWidgets()">{{showHideWidgetsLabel}}</a></li>
                             <li ng-if="userAuthority.canAdministerDashboard"><a href ng-click="saveDashboarLayoutAsDefault()">{{'save_layout_as_default'| translate}}</a></li>
-                            <li><a href ng-click="activiateTEI()">{{selectedTei.inactive ? 'activate_tei' : 'deactivate_tei' | translate}} {{trackedEntity.name}}</a></li>
+                            <li><a href ng-click="activiateTEI()">{{selectedTei.inactive ? 'activate_tei' : 'deactivate_tei' | translate}} {{trackedEntity.displayName}}</a></li>
                         </ul>
                     </div>
                 </div>          
@@ -49,7 +49,7 @@
 
                 <select ng-model="selectedProgram"
                         class="form-control-program"
-                        ng-options="program as program.name for program in programs | orderBy: 'name'" 
+                        ng-options="program as program.displayName for program in programs | orderBy: 'displayName'" 
                         ng-disabled="programs.length < 1"
                         ng-change="applySelectedProgram(selectedProgram)">
                     <option value="">{{programs.length > 0 ? 'please_select_a_program' : 'no_program_exists' | translate}}</option>
@@ -87,7 +87,7 @@
                             <ul class="dropdown-menu pull-right" role="menu">
                                 <li><a href ng-click="showHideWidgets()">{{showHideWidgetsLabel}}</a></li>
                                 <li ng-if="userAuthority.canAdministerDashboard"><a href ng-click="saveDashboarLayoutAsDefault()">{{'save_layout_as_default'| translate}}</a></li>
-                                <li><a href ng-click="activiateTEI()">{{selectedTei.inactive ? 'activate_tei' : 'deactivate_tei' | translate}} {{trackedEntity.name}}</a></li>
+                                <li><a href ng-click="activiateTEI()">{{selectedTei.inactive ? 'activate_tei' : 'deactivate_tei' | translate}} {{trackedEntity.displayName}}</a></li>
                             </ul>
                         </div>
                     </div>    

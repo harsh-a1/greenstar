@@ -131,9 +131,6 @@
         foreign-key="fk_chart_itemorgunitgroups_orgunitgroupid" />
     </list>
     
-    <many-to-one name="program" class="org.hisp.dhis.program.Program" column="programid"
-      foreign-key="fk_chart_programid" />
-    
     <property name="userOrganisationUnit" />
 
     <property name="userOrganisationUnitChildren" />

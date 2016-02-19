@@ -29,8 +29,12 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle;
  */
 
 import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.importexport.ImportStrategy;
 import org.hisp.dhis.preheat.Preheat;
 import org.hisp.dhis.preheat.PreheatIdentifier;
+import org.hisp.dhis.preheat.PreheatMode;
+import org.hisp.dhis.user.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,16 +46,37 @@ import java.util.Map;
  */
 public class ObjectBundle
 {
-    private ObjectBundleMode objectBundleMode = ObjectBundleMode.COMMIT;
+    private final User user;
 
-    private PreheatIdentifier preheatIdentifier = PreheatIdentifier.UID;
+    private final ObjectBundleMode objectBundleMode;
+
+    private final PreheatIdentifier preheatIdentifier;
+
+    private final PreheatMode preheatMode;
+
+    private final ImportStrategy importMode;
+
+    private final MergeMode mergeMode;
+
+    private ObjectBundleStatus objectBundleStatus = ObjectBundleStatus.CREATED;
 
     private Preheat preheat = new Preheat();
 
     private Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> objects = new HashMap<>();
 
-    public ObjectBundle()
+    public ObjectBundle( ObjectBundleParams params )
     {
+        this.user = params.getUser();
+        this.objectBundleMode = params.getObjectBundleMode();
+        this.preheatIdentifier = params.getPreheatIdentifier();
+        this.importMode = params.getImportMode();
+        this.preheatMode = params.getPreheatMode();
+        this.mergeMode = params.getMergeMode();
+    }
+
+    public User getUser()
+    {
+        return user;
     }
 
     public ObjectBundleMode getObjectBundleMode()
@@ -59,19 +84,34 @@ public class ObjectBundle
         return objectBundleMode;
     }
 
-    public void setObjectBundleMode( ObjectBundleMode objectBundleMode )
-    {
-        this.objectBundleMode = objectBundleMode;
-    }
-
     public PreheatIdentifier getPreheatIdentifier()
     {
         return preheatIdentifier;
     }
 
-    public void setPreheatIdentifier( PreheatIdentifier preheatIdentifier )
+    public PreheatMode getPreheatMode()
     {
-        this.preheatIdentifier = preheatIdentifier;
+        return preheatMode;
+    }
+
+    public ImportStrategy getImportMode()
+    {
+        return importMode;
+    }
+
+    public MergeMode getMergeMode()
+    {
+        return mergeMode;
+    }
+
+    public ObjectBundleStatus getObjectBundleStatus()
+    {
+        return objectBundleStatus;
+    }
+
+    public void setObjectBundleStatus( ObjectBundleStatus objectBundleStatus )
+    {
+        this.objectBundleStatus = objectBundleStatus;
     }
 
     public Preheat getPreheat()

@@ -4,6 +4,7 @@
 trackerCapture.controller('TeiReportController',
         function($scope,
                 $filter,
+                $translate,
                 CurrentSelection,
                 SessionStorageService,
                 DateUtils,
@@ -14,6 +15,7 @@ trackerCapture.controller('TeiReportController',
     $scope.showProgramReportDetailsDiv = false;
     $scope.enrollmentsByProgram = [];
     $scope.dashboardReady = false;
+    $scope.orgUnitLabel = $translate.instant('org_unit');
 
     $scope.$on('dashboardWidgets', function(event, args) {
         $scope.showProgramReportDetailsDiv = false;
@@ -150,9 +152,7 @@ trackerCapture.controller('TeiReportController',
                 });
 
                 //get enrollment details
-                EnrollmentService.get(enr).then(function(enrollment){
-                    enrollment.enrollmentDate = DateUtils.formatFromApiToUser(enrollment.enrollmentDate);
-                    enrollment.incidentDate = DateUtils.formatFromApiToUser(enrollment.incidentDate);            
+                EnrollmentService.get(enr).then(function(enrollment){            
                     angular.forEach(enrollment.notes, function(note){
                         note.storedDate = DateUtils.formatToHrsMins(note.storedDate);
                     });            

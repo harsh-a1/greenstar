@@ -16,6 +16,8 @@ trackerCapture.controller('ProgramSummaryController',
     $scope.ouModes = [{name: 'SELECTED'}, {name: 'CHILDREN'}, {name: 'DESCENDANTS'}, {name: 'ACCESSIBLE'}];         
     $scope.selectedOuMode = $scope.ouModes[0];
     $scope.report = {};
+    $scope.maxOptionSize = 30;
+    $scope.model = {};
     
     $scope.optionSets = CurrentSelection.getOptionSets();
     if(!$scope.optionSets){
@@ -30,7 +32,7 @@ trackerCapture.controller('ProgramSummaryController',
     
     //watch for selection of org unit from tree
     $scope.$watch('selectedOrgUnit', function() {      
-        $scope.selectedProgram = null;
+        $scope.model.selectedProgram = null;
         $scope.reportStarted = false;
         $scope.dataReady = false;  
         $scope.programStages = null;
@@ -44,20 +46,20 @@ trackerCapture.controller('ProgramSummaryController',
     $scope.loadPrograms = function(orgUnit) {        
         $scope.selectedOrgUnit = orgUnit;        
         if (angular.isObject($scope.selectedOrgUnit)){
-            ProgramFactory.getProgramsByOu($scope.selectedOrgUnit, $scope.selectedProgram).then(function(response){
+            ProgramFactory.getProgramsByOu($scope.selectedOrgUnit, $scope.model.selectedProgram).then(function(response){
                 $scope.programs = response.programs;
-                $scope.selectedProgram = response.selectedProgram;
+                $scope.model.selectedProgram = response.selectedProgram;
             });
         }        
     };
     
-    $scope.$watch('selectedProgram', function() {        
+    $scope.$watch('model.selectedProgram', function() {        
         $scope.programStages = null;
         $scope.stagesById = [];
-        if( angular.isObject($scope.selectedProgram)){            
+        if( angular.isObject($scope.model.selectedProgram)){            
             $scope.reportStarted = false;
             $scope.dataReady = false;            
-            ProgramStageFactory.getByProgram($scope.selectedProgram).then(function(stages){
+            ProgramStageFactory.getByProgram($scope.model.selectedProgram).then(function(stages){
                 $scope.programStages = stages;
                 $scope.stagesById = [];
                 angular.forEach(stages, function(stage){
@@ -69,27 +71,27 @@ trackerCapture.controller('ProgramSummaryController',
     
     $scope.generateReport = function(program, report, ouMode){
         
-        $scope.selectedProgram = program;
+        $scope.model.selectedProgram = program;
         $scope.report = report;
         $scope.selectedOuMode = ouMode;
         
         //check for form validity
         $scope.outerForm.submitted = true;        
-        if( $scope.outerForm.$invalid || !$scope.selectedProgram){
+        if( $scope.outerForm.$invalid || !$scope.model.selectedProgram){
             return false;
         }
         
         $scope.reportStarted = true;
         $scope.dataReady = false;
             
-        AttributesFactory.getByProgram($scope.selectedProgram).then(function(atts){            
+        AttributesFactory.getByProgram($scope.model.selectedProgram).then(function(atts){            
             var grid = TEIGridService.generateGridColumns(atts, $scope.selectedOuMode.name,true);   
             $scope.gridColumns = grid.columns;
         });  
         
         EventReportService.getEventReport($scope.selectedOrgUnit.id, 
                                         $scope.selectedOuMode.name, 
-                                        $scope.selectedProgram.id, 
+                                        $scope.model.selectedProgram.id, 
                                         DateUtils.formatFromUserToApi($scope.report.startDate), 
                                         DateUtils.formatFromUserToApi($scope.report.endDate), 
                                         null,
@@ -102,7 +104,7 @@ trackerCapture.controller('ProgramSummaryController',
                 angular.forEach(data.eventRows, function(ev){
                     if(ev.trackedEntityInstance){
                         ev.name = $scope.stagesById[ev.programStage].name;
-                        ev.programName = $scope.selectedProgram.name;
+                        ev.programName = $scope.model.selectedProgram.displayName;
                         ev.statusColor = EventUtils.getEventStatusColor(ev); 
                         ev.eventDate = DateUtils.formatFromApiToUser(ev.eventDate);
 

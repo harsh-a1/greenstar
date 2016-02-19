@@ -475,6 +475,10 @@ div#orgUnitTree {
     display: none;
 }
 
+.fa-stack {
+    cursor: pointer;
+}
+
 .fa-stack > .fa.fa-stack-1x.fa-circle.radio-save-success {
     color: #b9ffb9 !important;
 }
@@ -512,8 +516,28 @@ div#orgUnitTree {
     margin-left: -5px;
 }
 
-.custom-radio-error{
+.custom-radio-error {
     margin-left: 5px;
     width:100px;
     text-align: center;
+}
+
+.fa-stack-custom-large {
+    font-size: 20px;
+}
+
+.fa-stack-custom-small {
+    font-size: 10px;
+}
+
+.wrap-text {
+    word-wrap: break-word;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.fa-icon-width {
+    width: 15px;
 }

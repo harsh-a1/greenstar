@@ -53,21 +53,9 @@ public class DefaultUserKeyJsonValueService
     }
 
     @Override
-    public List<String> getKeysByUser( User user )
+    public UserKeyJsonValue getUserKeyJsonValue( User user, String namespace, String key )
     {
-        return userKeyJsonValueStore.getKeysByUser( user );
-    }
-
-    @Override
-    public void cleanUserData( User user )
-    {
-        userKeyJsonValueStore.getUserKeyJsonValueByUser( user ).forEach( userKeyJsonValueStore :: delete );
-    }
-
-    @Override
-    public UserKeyJsonValue getUserKeyJsonValue( User user, String key )
-    {
-        return userKeyJsonValueStore.getUserKeyJsonValue( user, key );
+        return userKeyJsonValueStore.getUserKeyJsonValue( user, namespace, key );
     }
 
     @Override
@@ -86,5 +74,24 @@ public class DefaultUserKeyJsonValueService
     public void deleteUserKeyJsonValue( UserKeyJsonValue userKeyJsonValue )
     {
         userKeyJsonValueStore.delete( userKeyJsonValue );
+    }
+
+    @Override
+    public List<String> getNamespacesByUser( User user )
+    {
+        return userKeyJsonValueStore.getNamespacesByUser( user );
+    }
+
+    @Override
+    public List<String> getKeysByUserAndNamespace( User user, String namespace )
+    {
+        return userKeyJsonValueStore.getKeysByUserAndNamespace( user, namespace );
+    }
+
+    @Override
+    public void deleteNamespaceFromUser( User user, String namespace )
+    {
+        userKeyJsonValueStore.getUserKeyJsonValueByUserAndNamespace( user, namespace ).forEach(
+            userKeyJsonValueStore::delete );
     }
 }

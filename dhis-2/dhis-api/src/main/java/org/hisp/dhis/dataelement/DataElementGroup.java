@@ -39,7 +39,7 @@ import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.common.MergeStrategy;
+import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.common.annotation.Scanned;
 import org.hisp.dhis.common.view.DetailedView;
@@ -77,7 +77,7 @@ public class DataElementGroup
     // -------------------------------------------------------------------------
     // Logic
     // -------------------------------------------------------------------------
-    
+
     public void addDataElement( DataElement dataElement )
     {
         members.add( dataElement );
@@ -177,19 +177,19 @@ public class DataElementGroup
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
             DataElementGroup dataElementGroup = (DataElementGroup) other;
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 groupSet = dataElementGroup.getGroupSet();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 groupSet = dataElementGroup.getGroupSet() == null ? groupSet : dataElementGroup.getGroupSet();
             }

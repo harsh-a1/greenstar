@@ -24,12 +24,6 @@
 		</action>
     </package>
     
-	<package name="dhis-web-mapping" extends="dhis-web-commons" namespace="/dhis-web-mapping">
-		<action name="index" class="org.hisp.dhis.commons.action.NoAction">
-			<result name="success" type="redirect">index.html</result>
-		</action>
-    </package>
-    
 	<package name="dhis-web-event-reports" extends="dhis-web-commons" namespace="/dhis-web-event-reports">
 		<action name="index" class="org.hisp.dhis.commons.action.NoAction">
 			<result name="success" type="redirect">index.html</result>
@@ -83,6 +77,12 @@
 	</package>
     
 	<package name="dhis-web-app-management" extends="dhis-web-commons" namespace="/dhis-web-app-management">
+		<action name="index" class="org.hisp.dhis.commons.action.NoAction">
+			<result name="success" type="redirect">#</result>
+		</action>
+	</package>
+
+	<package name="dhis-web-mapping" extends="dhis-web-commons" namespace="/dhis-web-mapping">
 		<action name="index" class="org.hisp.dhis.commons.action.NoAction">
 			<result name="success" type="redirect">#</result>
 		</action>

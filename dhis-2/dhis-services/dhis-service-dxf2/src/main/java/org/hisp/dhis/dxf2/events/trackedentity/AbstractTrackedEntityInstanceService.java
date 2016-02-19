@@ -151,7 +151,7 @@ public abstract class AbstractTrackedEntityInstanceService
         trackedEntityInstance.setOrgUnit( entityInstance.getOrganisationUnit().getUid() );
         trackedEntityInstance.setTrackedEntity( entityInstance.getTrackedEntity().getUid() );
         trackedEntityInstance.setCreated( entityInstance.getCreated().toString() );
-        trackedEntityInstance.setLastUpdated( entityInstance.getLastUpdated().toString() );
+        trackedEntityInstance.setLastUpdated( DateUtils.getLongGmtDateString( entityInstance.getLastUpdated() ) );
         trackedEntityInstance.setInactive( entityInstance.isInactive() );
 
         if ( includeRelationships )

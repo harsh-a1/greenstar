@@ -28,29 +28,16 @@ package org.hisp.dhis.common;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import static org.hisp.dhis.common.DimensionalObject.CATEGORYOPTIONCOMBO_DIM_ID;
-import static org.hisp.dhis.common.DimensionalObject.DATA_COLLAPSED_DIM_ID;
-import static org.hisp.dhis.common.DimensionalObject.DATA_X_DIM_ID;
-import static org.hisp.dhis.common.DimensionalObject.DIMENSION_SEP;
-import static org.hisp.dhis.common.DimensionalObject.ORGUNIT_DIM_ID;
-import static org.hisp.dhis.common.DimensionalObject.PERIOD_DIM_ID;
-import static org.hisp.dhis.common.DimensionalObject.STATIC_DIMS;
-import static org.hisp.dhis.organisationunit.OrganisationUnit.KEY_LEVEL;
-import static org.hisp.dhis.organisationunit.OrganisationUnit.KEY_ORGUNIT_GROUP;
-import static org.hisp.dhis.organisationunit.OrganisationUnit.KEY_USER_ORGUNIT;
-import static org.hisp.dhis.organisationunit.OrganisationUnit.KEY_USER_ORGUNIT_CHILDREN;
-import static org.hisp.dhis.organisationunit.OrganisationUnit.KEY_USER_ORGUNIT_GRANDCHILDREN;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.adapter.JacksonPeriodDeserializer;
@@ -79,21 +66,23 @@ import org.hisp.dhis.trackedentity.TrackedEntityDataElementDimension;
 import org.hisp.dhis.trackedentity.TrackedEntityProgramIndicatorDimension;
 import org.hisp.dhis.user.User;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.hisp.dhis.common.DimensionalObject.*;
+import static org.hisp.dhis.organisationunit.OrganisationUnit.*;
 
 /**
  * This class contains associations to dimensional meta-data. Should typically
  * be sub-classed by analytical objects like tables, maps and charts.
- * <p/>
+ * <p>
  * Implementation note: Objects currently managing this class are AnalyticsService,
  * DefaultDimensionService and the getDimensionalObject and getDimensionalObjectList
  * methods of this class.
@@ -112,9 +101,9 @@ public abstract class BaseAnalyticalObject
     // -------------------------------------------------------------------------
     // Persisted properties
     // -------------------------------------------------------------------------
-    
+
     protected List<DataDimensionItem> dataDimensionItems = new ArrayList<>();
-    
+
     @Scanned
     protected List<OrganisationUnit> organisationUnits = new ArrayList<>();
 
@@ -131,7 +120,7 @@ public abstract class BaseAnalyticalObject
 
     @Scanned
     protected List<Integer> organisationUnitLevels = new ArrayList<>();
-    
+
     @Scanned
     protected List<DataElementCategoryDimension> categoryDimensions = new ArrayList<>();
 
@@ -143,10 +132,10 @@ public abstract class BaseAnalyticalObject
 
     @Scanned
     protected List<TrackedEntityDataElementDimension> dataElementDimensions = new ArrayList<>();
-    
+
     @Scanned
     protected List<TrackedEntityProgramIndicatorDimension> programIndicatorDimensions = new ArrayList<>();
- 
+
     private Program program;
 
     protected boolean userOrganisationUnit;
@@ -165,9 +154,9 @@ public abstract class BaseAnalyticalObject
     protected int topLimit;
 
     protected AggregationType aggregationType;
-    
+
     protected boolean completedOnly;
-    
+
     // -------------------------------------------------------------------------
     // Analytical properties
     // -------------------------------------------------------------------------
@@ -179,7 +168,7 @@ public abstract class BaseAnalyticalObject
     protected transient List<DimensionalObject> filters = new ArrayList<>();
 
     protected transient Map<String, String> parentGraphMap = new HashMap<>();
-    
+
     // -------------------------------------------------------------------------
     // Transient properties
     // -------------------------------------------------------------------------
@@ -211,7 +200,7 @@ public abstract class BaseAnalyticalObject
     {
         return relatives != null && !relatives.isEmpty();
     }
-    
+
     public boolean hasOrganisationUnitLevels()
     {
         return organisationUnitLevels != null && !organisationUnitLevels.isEmpty();
@@ -221,7 +210,7 @@ public abstract class BaseAnalyticalObject
     {
         return itemOrganisationUnitGroups != null && !itemOrganisationUnitGroups.isEmpty();
     }
-    
+
     public boolean hasSortOrder()
     {
         return sortOrder != 0;
@@ -241,7 +230,7 @@ public abstract class BaseAnalyticalObject
         {
             this.transientOrganisationUnits.add( organisationUnit );
         }
-    }    
+    }
 
     /**
      * Returns dimension items for data dimensions.
@@ -250,10 +239,10 @@ public abstract class BaseAnalyticalObject
     {
         return dataDimensionItems.stream().map( DataDimensionItem::getDimensionalItemObject ).collect( Collectors.toList() );
     }
-    
+
     /**
      * Adds a data dimension object.
-     * 
+     *
      * @return true if a data dimension was added, false if not.
      */
     public boolean addDataDimensionItem( DimensionalItemObject object )
@@ -262,13 +251,13 @@ public abstract class BaseAnalyticalObject
         {
             return dataDimensionItems.add( DataDimensionItem.create( object ) );
         }
-        
+
         return false;
     }
 
     /**
      * Removes a data dimension object.
-     * 
+     *
      * @return true if a data dimension was removed, false if not.
      */
     public boolean removeDataDimensionItem( DimensionalItemObject object )
@@ -277,7 +266,7 @@ public abstract class BaseAnalyticalObject
         {
             return dataDimensionItems.remove( DataDimensionItem.create( object ) );
         }
-        
+
         return false;
     }
 
@@ -291,7 +280,7 @@ public abstract class BaseAnalyticalObject
             addDataDimensionItem( object );
         }
     }
-    
+
     /**
      * Returns all data elements in the data dimensions. The returned list is
      * immutable.
@@ -320,7 +309,7 @@ public abstract class BaseAnalyticalObject
      * Assembles a DimensionalObject based on the persisted properties of this
      * AnalyticalObject. Collapses indicators, data elements, data element
      * operands and data sets into the dx dimension.
-     * <p/>
+     * <p>
      * Collapses fixed and relative periods into the pe dimension. Collapses
      * fixed and user organisation units into the ou dimension.
      *
@@ -491,15 +480,15 @@ public abstract class BaseAnalyticalObject
             }
 
             // Tracked entity program indicator
-            
+
             Map<String, TrackedEntityProgramIndicatorDimension> programIndicators = Maps.uniqueIndex( programIndicatorDimensions, TrackedEntityProgramIndicatorDimension::getUid );
-                        
+
             if ( programIndicators.containsKey( dimension ) )
             {
                 TrackedEntityProgramIndicatorDimension teid = programIndicators.get( dimension );
-                
+
                 return new BaseDimensionalObject( dimension, DimensionType.PROGRAM_INDICATOR, null, teid.getDisplayName(), teid.getLegendSet(), teid.getFilter() );
-            }            
+            }
         }
 
         IdentifiableObjectUtils.removeDuplicates( items );
@@ -510,12 +499,12 @@ public abstract class BaseAnalyticalObject
     /**
      * Assembles a list of DimensionalObjects based on the concrete objects in
      * this BaseAnalyticalObject.
-     * <p/>
+     * <p>
      * Merges fixed and relative periods into the pe dimension, where the
      * RelativePeriods object is represented by enums (e.g. LAST_MONTH). Merges
      * fixed and user organisation units into the ou dimension, where user
      * organisation units properties are represented by enums (e.g. USER_ORG_UNIT).
-     * <p/>
+     * <p>
      * This method is useful when serializing the AnalyticalObject.
      *
      * @param dimension the dimension identifier.
@@ -592,7 +581,7 @@ public abstract class BaseAnalyticalObject
         }
         else if ( CATEGORYOPTIONCOMBO_DIM_ID.equals( dimension ) )
         {
-            return new BaseDimensionalObject( dimension, DimensionType.CATEGORY_OPTION_COMBO, new ArrayList<DimensionalItemObject>() ) ;
+            return new BaseDimensionalObject( dimension, DimensionType.CATEGORY_OPTION_COMBO, new ArrayList<DimensionalItemObject>() );
         }
         else if ( categoryDims.contains( dimension ) )
         {
@@ -684,13 +673,13 @@ public abstract class BaseAnalyticalObject
             }
 
             // Tracked entity program indicator
-            
+
             Map<String, TrackedEntityProgramIndicatorDimension> programIndicators = Maps.uniqueIndex( programIndicatorDimensions, TrackedEntityProgramIndicatorDimension::getUid );
-                        
+
             if ( programIndicators.containsKey( dimension ) )
             {
                 TrackedEntityProgramIndicatorDimension teid = programIndicators.get( dimension );
-                
+
                 return new BaseDimensionalObject( dimension, DimensionType.PROGRAM_INDICATOR, null, teid.getDisplayName(), teid.getLegendSet(), teid.getFilter() );
             }
         }
@@ -746,7 +735,7 @@ public abstract class BaseAnalyticalObject
      * Sorts the given key by splitting on the '-' character and sorting the
      * components alphabetically.
      *
-     * @param valueMap the mapping of keys and values.
+     * @param key the mapping of keys and values.
      */
     public static String sortKey( String key )
     {
@@ -834,9 +823,9 @@ public abstract class BaseAnalyticalObject
     }
 
     @Override
-    public void mergeWith( IdentifiableObject other, MergeStrategy strategy )
+    public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
-        super.mergeWith( other, strategy );
+        super.mergeWith( other, mergeMode );
 
         if ( other.getClass().isInstance( this ) )
         {
@@ -844,13 +833,13 @@ public abstract class BaseAnalyticalObject
 
             this.clear();
 
-            if ( strategy.isReplace() )
+            if ( mergeMode.isReplace() )
             {
                 relatives = object.getRelatives();
                 program = object.getProgram();
                 aggregationType = object.getAggregationType();
             }
-            else if ( strategy.isMerge() )
+            else if ( mergeMode.isMerge() )
             {
                 relatives = object.getRelatives() == null ? relatives : object.getRelatives();
                 program = object.getProgram() == null ? program : object.getProgram();

@@ -45,6 +45,7 @@ public interface Scheduler
     String CRON_EVERY_MIN = "0 0/1 * * * ?";
     String CRON_EVERY_15MIN = "0 0/15 * * * ?";
     String CRON_TEST = "0 * * * * ?";
+    String CRON_DAILY_8AM = "0 0 8 * * ?";
     
     /**
      * Execute the given task immediately.

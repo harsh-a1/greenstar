@@ -77,7 +77,7 @@ trackerCapture.controller('TEIAddController',
     }    
     
     $scope.selectedOrgUnit = SessionStorageService.get('SELECTED_OU');
-    $scope.selectedEnrollment = {enrollmentDate: $scope.today, incidentDate: $scope.today, orgUnitName: $scope.selectedOrgUnit.name};
+    $scope.selectedEnrollment = {enrollmentDate: $scope.today, incidentDate: $scope.today, orgUnitName: $scope.selectedOrgUnit.displayName};
 
     //Selections
     $scope.selectedOrgUnit = SessionStorageService.get('SELECTED_OU');
@@ -109,7 +109,7 @@ trackerCapture.controller('TEIAddController',
         CurrentSelection.setRelationshipOwner($scope.mainTei);
     }
     else{        
-        $scope.teiAddLabel = $scope.selectedAttribute && $scope.selectedAttribute.name ? $scope.selectedAttribute.name : $translate.instant('tracker_associate');
+        $scope.teiAddLabel = $scope.selectedAttribute && $scope.selectedAttribute.displayName ? $scope.selectedAttribute.displayName : $translate.instant('tracker_associate');
         $scope.addingTeiAssociate = true;
         ProgramFactory.getProgramsByOu($scope.selectedOrgUnit, $scope.selectedProgram).then(function(response){
             $scope.programs = response.programs;
@@ -404,7 +404,7 @@ trackerCapture.controller('TEIAddController',
                 var tei = angular.copy($scope.mainTei);
                 var relationship = {};
                 relationship.relationship = $scope.relationship.selected.id;
-                relationship.displayName = $scope.relationship.selected.name;
+                relationship.displayName = $scope.relationship.selected.displayName;
                 relationship.relative = {};
                 
                 relationship.trackedEntityInstanceA = $scope.selectedRelationship.aIsToB === $scope.relationship.selected.aIsToB ? $scope.mainTei.trackedEntityInstance : $scope.teiForRelationship.id;
@@ -699,7 +699,7 @@ trackerCapture.controller('TEIAddController',
                 $scope.tei[att.attribute] = att.value;
             });
 
-            $scope.tei.orgUnitName = $scope.selectedOrgUnit.name;
+            $scope.tei.orgUnitName = $scope.selectedOrgUnit.displayName;
             $scope.tei.created = DateUtils.formatFromApiToUser(new Date());
             
             CurrentSelection.setRelationshipInfo({tei: $scope.tei});

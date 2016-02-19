@@ -100,6 +100,7 @@ public enum SettingKey
     LAST_SUCCESSFUL_ANALYTICS_TABLES_UPDATE( "keyLastSuccessfulAnalyticsTablesUpdate", Date.class ),
     LAST_SUCCESSFUL_RESOURCE_TABLES_UPDATE( "keyLastSuccessfulResourceTablesUpdate", Date.class ),
     LAST_SUCCESSFUL_MONITORING( "keyLastSuccessfulMonitoring", Date.class ),
+    LAST_SUCCESSFUL_SMS_SCHEDULING( "lastSuccessfulSmsScheduling", Date.class ),
     HELP_PAGE_LINK( "helpPageLink", "../dhis-web-commons-about/help.action", String.class ),
     ACCEPTANCE_REQUIRED_FOR_APPROVAL( "keyAcceptanceRequiredForApproval", Boolean.FALSE, Boolean.class ),
     SYSTEM_NOTIFICATIONS_EMAIL( "keySystemNotificationsEmail" ),

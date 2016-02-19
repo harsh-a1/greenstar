@@ -214,9 +214,9 @@ trackerCapture.controller('DashboardController',
                                     angular.forEach(programs, function(program){                                    
                                         if( program.trackedEntity.id === $scope.selectedTei.trackedEntity ){
                                             $scope.programs.push(program);
-                                            $scope.programNames[program.id] = {id: program.id, name: program.name};
+                                            $scope.programNames[program.id] = {id: program.id, displayName: program.displayName};
                                             angular.forEach(program.programStages, function(stage){                
-                                                    $scope.programStageNames[stage.id] = {id: stage.id, name: stage.name};
+                                                    $scope.programStageNames[stage.id] = {id: stage.id, displayName: stage.displayName};
                                             });
 
                                             if($scope.selectedProgramId && program.id === $scope.selectedProgramId || selectedEnrollment && selectedEnrollment.program === program.id){
