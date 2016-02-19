@@ -1,0 +1,616 @@
+
+<script type="text/javascript">
+
+    var periods = dhis2.report.periods;
+    var period = periods[0];
+    var orgUnit = dhis2.report.organisationUnit;
+    orgUnit.parent = dhis2.report.organisationUnitHierarchy[1];
+    var orgUnitChildren = dhis2.report.organisationUnitChildren;
+    var orgUnitUIDs = "";
+
+    var prgUID = "ICtuV7AyvEo";
+
+    var programStageUid = "p7W65Qeeopn";
+    var TEIMap = [];
+    var TEICountMap = [];
+    if (jQuery.when.all===undefined) {
+        jQuery.when.all = function(deferreds) {
+            var deferred = new jQuery.Deferred();
+            $.when.apply(jQuery, deferreds).then(
+                    function() {
+                        deferred.resolve(Array.prototype.slice.call(arguments));
+                    },
+                    function() {
+                        deferred.fail(Array.prototype.slice.call(arguments));
+                    });
+
+            return deferred;
+        }
+    }
+
+
+    var tableDX = [
+
+        { dxName: "Client Registered by IPC Worker Report", dxId: "nsHRt3pmrLf", cocId: "" },
+    ];
+
+
+    var deUIDs = "";
+
+    var url = window.location.href;
+    var params = url.split('=');
+    var gotPeriod=params[2];
+    var showingTable="datavalue1";
+
+    jQuery( document ).ready( function() {
+
+        //validateReport();
+        $(".hideInPrint").hide();
+        orgUnitChildren.sort( function( a, b ){
+            if ( a.name < b.name )
+                return -1;
+            if ( a.name > b.name )
+                return 1;
+            return 0;
+        });
+
+        $.each( tableDX, function () {
+            deUIDs += this.dxId + ";";
+        });
+
+        $.each( orgUnitChildren, function () {
+            orgUnitUIDs += this.id + ";";
+        });
+
+        loadDataX();
+
+        $("#btnExport").click(function(e) {
+            window.open('data:application/vnd.ms-excel,'+ encodeURIComponent($('#printing').html()));
+            e.preventDefault();
+        });
+
+    });
+    function hideLoad()
+    {
+        document.getElementById("cover").style.display="none";
+        document.getElementById("loads").style.display="none";
+        document.getElementById("loading").style.display="none";
+        document.getElementsByTagName("body")[0].style.overflow="scroll";
+    }
+
+    function validateReport()
+    {
+        $.get("../api/organisationUnitGroups/hdvIWjIWixd?filter=organisationUnits.id:eq:"+orgUnit.id,function(json){
+
+            if( !json.name )
+            {
+                alert("Selected Facility is not in Intervention OU Group");
+                window.history.back();
+            }
+            else
+            {
+                loadData();
+            }
+        });
+    }
+
+
+    function getPeriod( pr )
+    {
+        var year = pr.substring(0,4);
+        var month = pr.substring(4,6);
+        var strMonth="";
+
+        if(month=="01" || month=="1") 		strMonth="January";
+        else if(month=="02" || month=="2")	strMonth="February";
+        else if(month=="03" || month=="3")	strMonth="March";
+        else if(month=="04" || month=="4")	strMonth="April";
+        else if(month=="05" || month=="5")	strMonth="May";
+        else if(month=="06" || month=="6")	strMonth="June";
+        else if(month=="07" || month=="7")	strMonth="July";
+        else if(month=="08" || month=="8")	strMonth="August";
+        else if(month=="09" || month=="9")	strMonth="September";
+        else if(month=="10")				strMonth="October";
+        else if(month=="11") 				strMonth="November";
+        else if(month=="12")				strMonth="December";
+
+        return strMonth + " " +year;
+    }
+
+    var periodArray = [];
+    var cYear = parseInt( gotPeriod.substring(0,4) );
+    var cMonth = parseInt( gotPeriod.substring(4,6) );
+    var periodsStr = gotPeriod.substring(0,4)+""+gotPeriod.substring(4,6);
+
+    var jsonData1;
+    var jsonData2;
+    var jsonData3;
+
+    function loadData()
+    {
+        document.getElementById('selectedOUName').innerHTML=orgUnit.name;
+        document.getElementById('period').innerHTML=getPeriod(gotPeriod);
+
+        //http://localhost:8090/dhis221/api/analytics.json?dimension=pe:THIS_MONTH&dimension=dx:fftwX6D3iuI;vMISOrzIDPL;Y3sftYIwjSx;Nr8JvumTkmZ;lO9hVUqHo9v;xi0iWC3fLH5;XWBvNBGaek0;xJbKdiq41l3&dimension=ou:Xyeh1Hkiz0i;IsDCrC4yKIB;VKvtcjd4XC3;R0DM4NKU4iX;gXg0zlcO1Xt;EjHkVXiw2tR;b0rHfpNxUUm;zUGO5Ho7Aqb&program=icAx8KDM1WT
+        var url = "../api/analytics.json?dimension=dx:"+ deUIDs +"&dimension=ou:"+ orgUnitUIDs +"&dimension=pe:"+ periodsStr +"&program="+prgUID;
+        console.log( url );
+        $.get(url, function(json)
+        {
+            //console.log( "../api/analytics.json?dimension=dx:"+ deUIDs +"&dimension=ou:"+ orgUnitUIDs +"&dimension=pe:"+ periodsStr );
+            //console.log( "************************" );
+
+            console.log( "************************URL: " + url );
+
+            jsonData1 = json;
+            //console.log( jsonData1 );
+
+            loadReport( );
+        });
+
+    }
+
+    function prepareIdToObjectMap (object,id){
+        var map = [];
+        for (var i=0;i<object.length;i++){
+            map[object[i][id]] = object[i];
+        }
+        return map;
+    }
+    function getAssociationWidgetAttributes(){
+        var def = $.Deferred();
+        $.get(  '../api/trackedEntityAttributes?fields=*,attributeValues[*,attribute[id,name,code]]&paging=false',function(response){
+            var associationWidgets = [];
+
+            if (!response.trackedEntityAttributes)
+                return associationWidgets;
+
+            for (var i=0;i<response.trackedEntityAttributes.length;i++){
+                if (response.trackedEntityAttributes[i].attributeValues)
+                    for (var j=0;j<response.trackedEntityAttributes[i].attributeValues.length;j++){
+                        if (response.trackedEntityAttributes[i].attributeValues[j].attribute.code=="ToBeShownInAssociationWidget"){
+                            if (response.trackedEntityAttributes[i].attributeValues[j].value){
+                                associationWidgets.push(response.trackedEntityAttributes[i]);
+                            }
+                        }
+                    }
+            }
+            def.resolve(associationWidgets);
+        });
+        return def;
+    }
+    function loadDataX()
+    {
+        var events = [];
+        document.getElementById('selectedOUName').innerHTML=orgUnit.name;
+        document.getElementById('period').innerHTML=getPeriod(gotPeriod);
+        var startDate = dhis2.report.date;
+        var date = new Date(dhis2.report.date);
+        var endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        endDate = endDate.getFullYear()+"-"+endDate.getMonth()+1+"-"+endDate.getDate();
+
+        //http://localhost:8090/dhis221/api/analytics.json?dimension=pe:THIS_MONTH&dimension=dx:fftwX6D3iuI;vMISOrzIDPL;Y3sftYIwjSx;Nr8JvumTkmZ;lO9hVUqHo9v;xi0iWC3fLH5;XWBvNBGaek0;xJbKdiq41l3&dimension=ou:Xyeh1Hkiz0i;IsDCrC4yKIB;VKvtcjd4XC3;R0DM4NKU4iX;gXg0zlcO1Xt;EjHkVXiw2tR;b0rHfpNxUUm;zUGO5Ho7Aqb&program=icAx8KDM1WT
+        var url = "../api/events.json?programStage="+programStageUid+"&orgUnit="+orgUnit.id+"&ouMode=CHILDREN&startDate="+startDate+"&endDate="+endDate;
+
+        console.log( url );
+        $.get(url, function(data)
+        {
+            // for each oprg unit children
+            // get the events and segregate by IPC worker
+            // use map
+            var orgUnitToEventsMap = [];
+            var orgUnitToReportStructureMap;
+            var reportStructure = [];
+
+//            var reportStructure = [
+//                {
+//                    orgUnitName : "",
+//                    IPC :  [{
+//                                    attributeId : "value",
+//                                    attributeId2 : "value",
+//                                    count : 0
+//                            },
+//                            {
+//
+//                            }]
+//                },
+//                {
+//
+//                }
+//            ]
+
+            for (var i=0;i<orgUnitChildren.length;i++){
+            //    $('#datavalue1').append("<tr><td>"+ orgUnitChildren[i].name+"</td></tr>")
+                orgUnitToEventsMap[orgUnitChildren[i].id] = [];
+
+                reportStructure.push({ orgUnitId : orgUnitChildren[i].id,
+                                    orgUnitName :orgUnitChildren[i].name,
+                                     IPC : []
+                                    });
+            }
+
+            orgUnitToReportStructureMap = prepareIdToObjectMap(reportStructure,"orgUnitId");
+
+            if (!data.events){
+                // handle for empty report
+                return
+            }
+            for (var i=0;i<data.events.length;i++){
+
+                if (!orgUnitToReportStructureMap[data.events[i].orgUnit])
+                    reportStructure.push({ orgUnitId : data.events[i].orgUnit.id,
+                                       orgUnitName : data.events[i].orgUnit.name,
+                                        IPC : []
+                                    });
+
+                if (data.events[i].eventMembers){
+                    //group by IPC Worker
+                    for (var eventMemberCount=0;eventMemberCount<data.events[i].eventMembers.length;eventMemberCount++){
+                        if (data.events[i].eventMembers[eventMemberCount].trackedEntity == "lLKXYUBAAMy"){
+
+                            var IPCExists =false;
+                            for (var IPCCount=0;IPCCount<orgUnitToReportStructureMap[data.events[i].orgUnit].IPC.length;IPCCount++){
+                                if (orgUnitToReportStructureMap[data.events[i].orgUnit].IPC[IPCCount].trackedEntityInstance == data.events[i].eventMembers[eventMemberCount].trackedEntityInstance){
+                                    orgUnitToReportStructureMap[data.events[i].orgUnit].IPC[IPCCount].count = orgUnitToReportStructureMap[data.events[i].orgUnit].IPC[IPCCount].count+1;
+                                    IPCExists = true;
+                                    break;
+                                }
+                            }
+                            if (!IPCExists && data.events[i].eventMembers[eventMemberCount].attributes) {
+                                for (var j = 0; j < data.events[i].eventMembers[eventMemberCount].attributes.length; j++) {
+                                    data.events[i].eventMembers[eventMemberCount][data.events[i].eventMembers[eventMemberCount].attributes[j].attribute] = data.events[i].eventMembers[eventMemberCount].attributes[j].value;
+                                }
+                                data.events[i].eventMembers[eventMemberCount].count=1;
+                                orgUnitToReportStructureMap[data.events[i].orgUnit].IPC.push(data.events[i].eventMembers[eventMemberCount]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            getAssociationWidgetAttributes().then(function(data){
+                // prepare table header
+                var headerHtml = "<thead><tr><th rowspan='2'>S No.</th>" +
+                                            "<th rowspan='2'>Organisation Unit</th>" +
+                                            "<th colspan='"+data.length+"'>IPC Details</th>" +
+                                            "<th rowspan='2'>Count</th></tr><tr>";
+
+                for (var attributeIndex=0;attributeIndex<data.length;attributeIndex++){
+                    headerHtml = headerHtml+"<th>"+data[attributeIndex].displayName+"</th>";
+                }
+                headerHtml = headerHtml+"</tr></thead>";
+                $('#datavalue1').append(headerHtml);
+                var tableDataHtml = "<tbody>";
+                for (var i=0;i<reportStructure.length;i++){
+                    var IPCLength = reportStructure[i].IPC.length;
+                    var rowSpanHtml = "";
+                    if (IPCLength>0){
+                        rowSpanHtml = " rowspan="+reportStructure[i].IPC.length+" ";
+                    }
+                    tableDataHtml = tableDataHtml+"<tr><td "+rowSpanHtml+"'>"+(i+1)+"</td>";
+                    tableDataHtml = tableDataHtml+"<td "+rowSpanHtml+"'>"+reportStructure[i].orgUnitName+"</td>";
+                    if (reportStructure[i].IPC.length>0) {
+                        for (var j = 0; j < reportStructure[i].IPC.length; j++) {
+                            for (var attributeIndex = 0; attributeIndex < data.length; attributeIndex++) {
+                                var attValue = reportStructure[i].IPC[j][data[attributeIndex].id];
+                                tableDataHtml = tableDataHtml + "<td>" + (!attValue? "":attValue) + "</td>";
+                            }
+                            tableDataHtml = tableDataHtml + "<td>" + reportStructure[i].IPC[j].count + "</td></tr>";
+                        }
+                    }else{
+                        for (var attributeIndex = 0; attributeIndex < data.length; attributeIndex++) {
+                            tableDataHtml = tableDataHtml + "<td></td>";
+                        }
+                        tableDataHtml = tableDataHtml + "<td></td></tr>";
+                    }
+                }
+                tableDataHtml = tableDataHtml + "</tbody>";
+                $('#datavalue1').append(tableDataHtml);
+
+            })
+
+//            var promiseArray = [];
+//
+//            //console.log( "../api/analytics.json?dimension=dx:"+ deUIDs +"&dimension=ou:"+ orgUnitUIDs +"&dimension=pe:"+ periodsStr );
+//            //console.log( "************************" );
+//
+//            console.log( "************************URL: " + url );
+//
+//            jsonData1 = json;
+//            //console.log( jsonData1 );
+//            for (var i=0;i<json.events.length;i++){
+//                promiseArray.push($.get("../api/events/"+json.events[i].event));
+//            }
+//
+//            $.when.apply($, promiseArray).then(function() {
+//                for (var argsIndex=0;argsIndex<arguments.length;argsIndex++){
+//                    events.push(arguments[argsIndex][0]);
+//                    console.log("DONE", this, arguments[argsIndex]);
+//                }
+//                debugger
+//            }, function(e) {
+//                console.log("My ajax failed");
+//            });
+
+           // loadReport( );
+        });
+    }
+
+    function formatByAssociation(events){
+        TEIMap = [];
+        TEICountMap = [];
+        for (var i=0; i<events.length;i++ ){
+            if (events[i].eventMembers){
+                for (var j=0;j<events[i].eventMembers.length;j++){
+                    if (!TEIMap[events[i].eventMembers[j].id]){
+                        TEIMap[events[i].eventMembers[j].id] = 0;
+                    }
+                    TEIMap[events[i].eventMembers[j].id] = events[i].eventMembers[j];
+                    TEICountMap[events[i].eventMembers[j].id] = TEIMap[events[i].eventMembers[j].id]+1;
+                }
+            }
+        }
+    }
+    function loadReport( )
+    {
+        var htmlReport="";
+        var selYear = gotPeriod.substring(0,4);
+        var selMonth = gotPeriod.substring(4,6);
+
+        //console.log( jsonData1 );
+        $("#"+showingTable+" > thead").html("");
+
+        htmlReport += "<thead><tr bgcolor='#F2DDDC' align='center' height='44'>";
+        htmlReport += "<td>OrgUnit</td>";
+        $.each( tableDX, function () {
+            htmlReport += "<td>"+ this.dxName +"</td>;";
+        });
+        htmlReport +="</tr></thead>";
+
+        $("#"+showingTable+" > tbody").html("");
+        htmlReport += "<tbody>";
+        $.each( orgUnitChildren, function ( index1, ou ) {
+            htmlReport+="<tr>";
+            htmlReport+="<td align='left'style='padding-left:5px'>"+ou.name+"</td>";
+            $.each( tableDX, function ( index2, de ) {
+                var temp = getCellValue( jsonData1, de.dxId, ou.id, periodsStr );
+                htmlReport+="<td align='center'>"+ temp +"</td>";
+            });
+            htmlReport+="</tr>";
+        });
+        htmlReport+="</tbody>";
+
+        $("#"+showingTable ).append( htmlReport );
+        hideLoad();
+    }
+
+    function getCellValue( json, de, ou, periodsStr )
+    {
+        var result=0;
+        for (var i=0; i < json.rows.length; i++)
+        {
+            //console.log( json.rows[i][0] + " : " + json.rows[i][1] + " : " + json.rows[i][2] + " : " + json.rows[i][3] );
+            //console.log( de + " : " + ou + " : " + coc );
+            //console.log( "********************************************" );
+            if( json.rows[i][0] == de && json.rows[i][2] == periodsStr && json.rows[i][1] == ou && json.rows[i][3]!= null )
+            {
+                result=json.rows[i][3];
+            }
+        }
+        return parseInt( result );
+    }
+
+</script>
+
+
+<!-- download script ------------------------------------------------------
+		--------------------------------------------------------------------------
+		-------------------------------------------------------------------------------------- -->
+<script type="text/javascript">
+    var tablesToExcel = (function() {
+        var uri ='data:application/vnd.ms-excel;base64,', tmplWorkbookXML ='<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'+'<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>ThaiND</Author><Created>{created}</Created></DocumentProperties>'+'<Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Horizontal="Center" ss:WrapText="1"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders><Font/><Interior /><NumberFormat /><Protection /></Style><Style ss:ID="s21"><Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style> <Style ss:ID="s22"><Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style><Style ss:ID="s64"> <Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center" ss:Indent="0" ss:Rotate="90"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /> </Style> </Styles>'+'{worksheets}</Workbook>', tmplWorksheetXML ='<Worksheet ss:Name="{nameWS}"><Table><Column ss:AutoFitWidth="0" ss:Width="100"/><Column ss:AutoFitWidth="0" ss:Width="150"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/>{rows}</Table></Worksheet>', tmplCellXML ='<Cell ss:StyleID="{sid}" ss:MergeAcross="{mrg}"><Data ss:Type="{dtype}">{data}</Data></Cell>', base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+
+        return function(tables, wsnames, wbname) {
+            var ctx = "";
+            var workbookXML = "";
+            var worksheetsXML = "";
+            var rowsXML = "";
+
+            for (var i = 0; i < tables.length; i++)
+            {
+
+                if (!tables[i].nodeType)
+                    tables[i] = document.getElementById(tables[i]);
+
+                for (var j = 0; j < tables[i].rows.length; j++)
+                {
+                    rowsXML +='<Row>'for (var k = 0; k < tables[i].rows[j].cells.length; k++)
+                {
+
+                    var cols=tables[i].rows[j].cells[k].getAttribute("colspan");
+                    var rws=tables[i].rows[j].cells[k].getAttribute("rowspan");
+                    var styl=tables[i].rows[j].cells[k].getAttribute("bgcolor");
+                    var styl2=tables[i].rows[j].getAttribute("bgcolor");
+                    var cls=tables[i].rows[j].cells[k].getAttribute("class");
+
+                    var dataType ='String';
+                    var dataValue = tables[i].rows[j].cells[k].innerHTML;
+                    var typeD="";
+                    var parsed=parseInt(dataValue);
+
+                    if (parsed==dataValue)
+                    {
+                        typeD="Number";
+                    }
+                    else
+                    {
+                        typeD="String";
+                    }
+
+
+
+                    if(styl2)
+                    {
+                        if(cols)
+                        {
+                            if(cls=="aso")
+                            {
+                                ctx = {data: dataValue, mrg: cols-1, sid:"s64",dtype:typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+                            else
+                            {
+                                ctx = {data: dataValue, mrg: cols-1, sid:"s22",dtype:typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+                        }
+
+                        else
+                        {
+                            if(cls=="aso")
+                            {
+                                ctx = {data: dataValue, mrg: 0, sid:"s64",dtype:typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+                            else
+                            {
+                                ctx = {data: dataValue, mrg: 0, sid: "s22",dtype:typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+                        }
+                    }
+
+                    else if(styl)
+                    {
+                        if(cols)
+                        {
+                            ctx = {data: dataValue, mrg: cols-1, sid:"s21",dtype:typeD};
+                            rowsXML += format(tmplCellXML, ctx);
+                        }
+
+                        else
+                        {
+                            ctx = {data: dataValue, mrg: 0, sid: "s21",dtype:typeD};
+                            rowsXML += format(tmplCellXML, ctx);
+                        }
+                    }
+
+                    else
+                    {
+                        if(cols)
+                        {
+                            ctx = {data: dataValue, mrg: cols-1, sid:"Default",dtype:typeD};
+                            rowsXML += format(tmplCellXML, ctx);
+                        }
+
+                        else
+                        {
+                            ctx = {data: dataValue, mrg: 0, sid: "Default",dtype:typeD};
+                            rowsXML += format(tmplCellXML, ctx);
+                        }
+
+                    }
+
+                }
+                    rowsXML +='</Row>'}
+                ctx = {rows: rowsXML, nameWS: wsnames[i] ||'Sheet'+ i};
+                worksheetsXML += format(tmplWorksheetXML, ctx);
+                rowsXML = "";
+            }
+
+            ctx = {created: (new Date()).getTime(), worksheets: worksheetsXML};
+            workbookXML = format(tmplWorkbookXML, ctx);
+
+            //console.log(workbookXML);
+
+            var link = document.createElement("A");
+            link.href = uri + base64(workbookXML);
+            link.download = wbname ||'Workbook.xls';
+            link.target ='_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    })();
+</script>
+<script type="text/javascript">
+    function printContent(el){
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>
+<p><span style="font-size:12px;">
+<style>
+
+    td
+    {
+        padding: 5px 10px;
+        font:Arial, Helvetica, sans-serif;
+    }
+
+    bd
+    {
+        border-style: solid;
+        border-color:#000000;
+    }
+
+    #cover{ position:fixed; top:0; left:0; background:rgba(0,0,0,0.7); z-index:5; width:100%; height:100%;}
+    #loads { height:100px; width:500px; position:fixed; z-index:10;  margin:0 auto;   top: 50%; left: 50%; margin-top:-50px; margin-left:-250px; background:#999; border:5px solid #cccccc; text-align=center; border-radius:5px; }
+    .loading { width:400px; font-size:20px; font-family:verdana; font-weight:bolder; position:fixed;  top: 50%; left: 50%; margin:0 auto; margin-top:-8px; margin-left:-200px;}
+    .vtext{
+        /*width:1px;
+        height: 50px;
+        -ms-transform: rotate(90deg);
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+        border-style: hidden;*/
+    }
+
+</style>
+<!--<div id="loads" > <p class="loading" align="center">Reports Loading... Please Wait...</p></div>
+		<div id="cover" > </div>
+-->
+</span></p>
+<table>
+    <tr>
+        <td>
+            <input type="button" id="btnBack" value=" Go to Dashboard" onclick="location.href='../dhis-web-dashboard-integration/index.action'"/>
+            <input type="button"  onclick="printContent('printing');" value="Print"/>
+            <!--<input type="button" id="btnExport" value=" Download Excel " />-->
+
+        </td>
+    </tr>
+</table>
+</br></br>
+
+<div id="printing">
+    <table >
+        <tr>
+            <td>
+                <table border="1" cellspacing="6" cellpadding="4"   width="100%" style="border-collapse:collapse; border:2px; font-weight:bolder" >
+                    <thead>
+                    <tr align="center"  height="27">
+                        <td  colspan="11" width="2082" height="27" class="col" bgcolor="#32849C" ><font color="white"><b>Client Registered by IPC Worker Report</b></font></td>
+                    </tr>
+                    <tr bgcolor="#F2DDDC" align="center" height="20">
+                        <td colspan="1" height="20" align="right"><b>Parent OU:</b></td>
+                        <td colspan="2" id="selectedOUName">&nbsp;</td>
+                        <td colspan="5">&nbsp;</td>
+                        <td colspan="1" align="right"><b>Month: </b></td>
+                        <td colspan="2" id="period">&nbsp;</td>
+                    </tr>
+                    </thead>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table id="datavalue1" border="1" cellspacing="6" cellpadding="4" width="100%" style="border-collapse:collapse; border:2px; font-weight:bolder" >
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

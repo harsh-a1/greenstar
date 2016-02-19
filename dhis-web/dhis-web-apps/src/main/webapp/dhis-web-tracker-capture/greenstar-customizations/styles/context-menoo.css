@@ -1,0 +1,27 @@
+
+#contextMenoo li{
+    margin-top: 3%;
+    list-style-type: none;
+    display: block;
+    text-decoration: none;
+    padding: 2px;
+    cursor: pointer;
+}
+
+#contextMenoo li:hover{
+    box-shadow: 1px 1px 5px rgba(2,4,2,.3);
+    background-color: floralwhite;
+}
+
+#contextMenoo {
+    position: fixed;
+    min-width: 15%;
+    min-height: 20%;
+    background-color: whitesmoke;
+    overflow: auto;
+    border: 1px solid transparent;
+    border-color: #d9edf7;
+    border-radius: 5px;
+    box-shadow: #ccc 0 0px 30px 0;
+    opacity: 0.9;
+}
