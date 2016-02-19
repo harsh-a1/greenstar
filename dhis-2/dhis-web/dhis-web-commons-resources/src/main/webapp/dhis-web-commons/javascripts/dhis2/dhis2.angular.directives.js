@@ -625,4 +625,50 @@ var d2Directives = angular.module('d2Directives', [])
             }],
         link: function (scope, element, attrs) {}
     };
+}).directive('d2Info',function($translate){
+    var showIcon = true;
+    return {
+        restrict: 'EA',
+        template:'<span type="button" class="glyphicon glyphicon-info-sign info-icon" data-container="body" data-toggle="popover"'+
+        'data-placement="right" data-html="true" data-title="{{title}}" data-content="{{formattedContent}}"></span>',
+        scope: {
+            title:'@?',
+            content:'@'
+        },
+        link: function(scope,element, attrs) {
+            scope.formattedContent = getFormattedContent(scope.content);
+            $('body').on('click', function (e) {
+                scope.$apply();
+
+                $('[data-toggle="popover"]').each(function () {
+                    if (!$(this).is(e.target)) {
+                        $(this).popover('hide');
+                    } else {
+                        if(showIcon) {
+                            $(this).popover('show');
+                            showIcon=false;
+                        }
+                    }
+                });
+            });
+
+            function getFormattedContent(contentArrayString) {
+                var contentArray = $.parseJSON(contentArrayString);
+                var formattedString = "";
+                for (var index = 0; index < contentArray.length; index++) {
+                    var content = contentArray[index];
+                    if (!content.data) {
+                        content.data="Not available";
+                    }
+                    if (content.name === $translate.instant('url') && content.data !== "Not available") {
+                        formattedString += '<div><b>'+ content.name + ': </b><a href=' + content.data + ' target=\'_blank\' style=\'cursor:pointer;pointer-events:auto;\'>' + content.data + '</a></div>';
+
+                    } else {
+                        formattedString += '<div><b>' + content.name + ': </b>' + content.data + '</div>';
+                    }
+                }
+                return formattedString;
+            }
+        }
+    }
 });
