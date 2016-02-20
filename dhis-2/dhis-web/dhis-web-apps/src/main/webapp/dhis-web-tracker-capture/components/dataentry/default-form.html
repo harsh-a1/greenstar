@@ -17,9 +17,9 @@
                 <span ng-bind="prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName"></span>
                 <span ng-if="prStDe.compulsory" class="required">*</span>
                 <span class="hideInPrint">
-                    <a ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}" ng-init="showHelpText[prStDe.dataElement.id] = false;" ng-click="showHelpText[prStDe.dataElement.id] = !showHelpText[prStDe.dataElement.id]">
-                        <span class="glyphicon glyphicon-info-sign" ></span>
-                        <span ng-show="showHelpText[prStDe.dataElement.id]" ><br>{{prStDe.dataElement.description}}</span>
+                    <a ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}">
+                        <d2-info data-content='[{"name":"{{"description" | translate}}", "data":"{{prStDe.dataElement.description}}"}]'>
+                        </d2-info>
                     </a>
                     <span ng-if="otherValuesLists[prStDe.dataElement.id]" ng-repeat="altValue in otherValuesLists[prStDe.dataElement.id] track by $index">
                         <span class="label label-default">{{altValue | translate}}</span>
@@ -51,9 +51,9 @@
             <accordion-group is-open="section.open" ng-repeat='section in currentStage.programStageSections' ng-if="!hiddenSections[currentEvent.event][section.id]" style="overflow:visible">
                 <accordion-heading>
                     {{section.displayName}}
-                    <a ng-if="section.description" Title="{{section.description}}" ng-init="showHelpText.sections[section.id] = false;" ng-click="showHelpText.sections[section.id] = !showHelpText.sections[section.id];section.open =!section.open;">
-                        <span class="glyphicon glyphicon-info-sign" ></span>
-                        <span ng-show="showHelpText.sections[section.id]" ><br>{{section.description}}</span>
+                    <a ng-if="section.description" Title="{{section.description}}" ng-click="section.open =!section.open;">
+                        <d2-info data-content='[{"name":"{{"description" | translate}}", "data":"{{section.description}}"}]'>
+                        </d2-info>
                     </a>
                 </accordion-heading>
                 
@@ -80,9 +80,9 @@
                                 <span ng-bind="prStDes[de.dataElement.id].dataElement.formName ? prStDes[de.dataElement.id].dataElement.formName : prStDes[de.dataElement.id].dataElement.displayName"></span>       
                                 <span ng-if="prStDes[de.dataElement.id].compulsory" class="required">*</span>
                                 <span class="hideInPrint">
-                                    <a ng-if="prStDes[de.dataElement.id].dataElement.description" Title="{{prStDes[de.dataElement.id].dataElement.description}}" ng-init="showHelpText[de.dataElement.id] = false;" ng-click="showHelpText[de.dataElement.id] = !showHelpText[de.dataElement.id]">
-                                        <span class="glyphicon glyphicon-info-sign" ></span>
-                                        <span ng-show="showHelpText[de.dataElement.id]" ><br>{{prStDes[de.dataElement.id].dataElement.description}}</span>
+                                    <a ng-if="prStDes[de.dataElement.id].dataElement.description" Title="{{prStDes[de.dataElement.id].dataElement.description}}">
+                                        <d2-info data-content='[{"name":"{{"description" | translate}}", "data":"{{prStDes[de.dataElement.id].dataElement.description}}"}]'>
+                                        </d2-info>
                                     </a>   
                                     <span ng-if="otherValuesLists[de.dataElement.id] && showOtherValuesLists" ng-repeat="altValue in otherValuesLists[de.dataElement.id]">
                                         <span class="label label-default">{{altValue | translate}}</span>

@@ -94,11 +94,25 @@ public class ScheduleTasksAction
     // Input
     // -------------------------------------------------------------------------
 
+    private boolean executeNow;
+    
+    public void setExecuteNow( boolean executeNow )
+    {
+        this.executeNow = executeNow;
+    }
+
     private boolean schedule;
 
     public void setSchedule( boolean schedule )
     {
         this.schedule = schedule;
+    }
+    
+    private String taskKey;
+
+    public void setTaskKey( String taskKey )
+    {
+        this.taskKey = taskKey;
     }
 
     private String resourceTableStrategy;
@@ -228,6 +242,13 @@ public class ScheduleTasksAction
     @Override
     public String execute()
     {
+        if ( executeNow )
+        {       
+            schedulingManager.executeTask( taskKey );
+            
+            return SUCCESS;
+        }
+        
         if ( schedule )
         {
             if ( ScheduledTaskStatus.RUNNING.equals( schedulingManager.getTaskStatus() ) )

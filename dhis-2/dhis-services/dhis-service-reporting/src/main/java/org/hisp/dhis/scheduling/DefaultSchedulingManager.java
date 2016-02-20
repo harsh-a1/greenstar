@@ -167,4 +167,15 @@ public class DefaultSchedulingManager
         
         return scheduledTasks;
     }
+
+    @Override
+    public void executeTask( String taskKey )
+    {
+        Runnable task = tasks.get( taskKey );
+        
+        if (task != null)
+        {
+            scheduler.executeTask( task );
+        }
+    }
 }

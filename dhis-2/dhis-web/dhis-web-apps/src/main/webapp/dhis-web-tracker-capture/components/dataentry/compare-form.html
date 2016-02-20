@@ -162,9 +162,9 @@
                         <span ng-bind="prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName"></span>
                         <span ng-if="prStDe.compulsory" class="required">*</span>
                         <span class="hideInPrint">
-                            <a ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}" ng-init="showHelpText[prStDe.dataElement.id] = false;" ng-click="showHelpText[prStDe.dataElement.id] = !showHelpText[prStDe.dataElement.id]">
-                                <span class="glyphicon glyphicon-info-sign" ></span>
-                                <span ng-show="showHelpText[prStDe.dataElement.id]" ><br>{{prStDe.dataElement.description}}</span>
+                            <a ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}">
+                                <d2-info data-content='[{"name":"{{"description" | translate}}", "data":"{{prStDe.dataElement.description}}"}]'>
+                                </d2-info>
                             </a>                        
                         </span>                       
                     </div>
@@ -306,9 +306,9 @@
                                         <span ng-bind="prStDes[de.dataElement.id].dataElement.formName ? prStDes[de.dataElement.id].dataElement.formName : prStDes[de.dataElement.id].dataElement.displayName"></span>                                
                                         <span ng-if="prStDes[de.dataElement.id].compulsory" class="required">*</span>
                                         <span class="hideInPrint">
-                                            <a ng-if="prStDes[de.dataElement.id].dataElement.description" Title="{{prStDes[de.dataElement.id].dataElement.description}}" ng-init="showHelpText[de.dataElement.id] = false;" ng-click="showHelpText[de.dataElement.id] = !showHelpText[de.dataElement.id]">
-                                                <span class="glyphicon glyphicon-info-sign" ></span>
-                                                <span ng-show="showHelpText[de.dataElement.id]" ><br>{{prStDes[de.dataElement.id].dataElement.description}}</span>
+                                            <a ng-if="prStDes[de.dataElement.id].dataElement.description" Title="{{prStDes[de.dataElement.id].dataElement.description}}">
+                                                <d2-info data-content='[{"name":"{{"description" | translate}}", "data":"{{prStDes[de.dataElement.id].dataElement.description}}"}]'>
+                                                </d2-info>
                                             </a>                                       
                                         </span>          
                                     </div>

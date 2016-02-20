@@ -45,7 +45,6 @@ trackerCapture.controller('DataEntryController',
     $scope.showEventsAsTables = false;
     //variable is set while looping through the program stages later.
     $scope.stagesCanBeShownAsTable = false;
-    $scope.showHelpText = {};
     $scope.hiddenFields = [];
     $scope.assignedFields = [];
     $scope.errorMessages = {};

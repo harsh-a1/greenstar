@@ -66,9 +66,9 @@
                     <th class="" ng-repeat="prStDe in currentStage.programStageDataElements">
                         {{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.displayName}}
                         <span ng-if="prStDe.compulsory" class="required">*</span>
-                        <a href ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}" ng-init="showHelpText[prStDe.dataElement.id] = false;" ng-click="showHelpText[prStDe.dataElement.id] = !showHelpText[prStDe.dataElement.id]">
-                            <span class="glyphicon glyphicon-info-sign" ></span>
-                            <span ng-show="showHelpText[prStDe.dataElement.id]" ><br>{{prStDe.dataElement.description}}</span>
+                        <a href ng-if="prStDe.dataElement.description" Title="{{prStDe.dataElement.description}}">
+                            <d2-info data-content='[{"name":"{{"description" | translate}}", "data":"{{prStDe.dataElement.description}}"}]'>
+                            </d2-info>
                         </a>
                     </th>
                     <th class="" style="text-align: right">Status</th>

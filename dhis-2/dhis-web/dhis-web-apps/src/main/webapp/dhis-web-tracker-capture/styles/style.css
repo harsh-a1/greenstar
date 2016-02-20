@@ -1926,3 +1926,16 @@ a.disable-link-effects:focus {
     margin-top: 46%;
     margin-left: 1%;
 }
+
+/*classes for the details icon on dataelements*/
+.info-icon {
+    color: #3162C5;
+    width:14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.popover {
+    max-width:400px;
+    pointer-events:none;
+}

@@ -1223,6 +1223,8 @@ Ext.onReady( function() {
 
 				delete favorite.id;
 				delete favorite.parentGraphMap;
+				
+                delete favorite.program;
 			}
 
 			return favorite;

@@ -91,7 +91,7 @@
   <bean id="resourceTable15MinTask" class="org.hisp.dhis.resourcetable.scheduling.ResourceTableTask" scope="prototype" />
   
   <bean id="abstractScheduledMessageTask"
-		class="org.hisp.dhis.sms.scheduling.SendScheduledMessageTask" scope="prototype">
+		class="org.hisp.dhis.sms.scheduling.SendScheduledMessageTask">
 		<property name="programStageInstanceService"
 			ref="org.hisp.dhis.program.ProgramStageInstanceService" />
 		<property name="outboundSmsService"
@@ -102,21 +102,21 @@
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
-	<bean id="sendMessageScheduledTask"
+	<bean id="sendScheduledMessageTask"
 		class="org.hisp.dhis.sms.scheduling.SendScheduledMessageTask"
 		parent="abstractScheduledMessageTask" scope="prototype">
 		<property name="sendingMessage" value="true" />
 		<property name="sendNow" value="false"/>
 	</bean>
 
-	<bean id="scheduleMessageTask"
+	<bean id="smsSchedulerTask"
 		class="org.hisp.dhis.sms.scheduling.SendScheduledMessageTask"
 		parent="abstractScheduledMessageTask" scope="prototype">
 		<property name="sendingMessage" value="false" />
 		<property name="sendNow" value="false"/>
 	</bean>
 	
-	<bean id="sendMessageScheduledTaskNow"
+	<bean id="sendScheduledMessageTaskNow"
 		class="org.hisp.dhis.sms.scheduling.SendScheduledMessageTask"
 		parent="abstractScheduledMessageTask" scope="prototype">
 		<property name="sendingMessage" value="false" />

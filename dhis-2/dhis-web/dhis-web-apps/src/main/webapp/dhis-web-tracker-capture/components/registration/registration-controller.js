@@ -34,10 +34,7 @@ trackerCapture.controller('RegistrationController',
     
     $scope.helpTexts = {};
     
-    $scope.showHelpText = function(attributeId){
-        $scope.helpTexts[attributeId] = $scope.helpTexts[attributeId] ? false : true;
-    };
-    
+
     $scope.attributesById = CurrentSelection.getAttributesById();
     if(!$scope.attributesById){
         $scope.attributesById = [];

@@ -1121,6 +1121,8 @@ Ext.onReady( function() {
 				delete favorite.parentGraphMap;
 
                 delete favorite.id;
+
+                delete favorite.program;
 			}
 
 			return favorite;

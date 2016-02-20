@@ -80,9 +80,10 @@
 <select id="smsSchedulerStrategy" name="smsSchedulerStrategy" class="scheduling">
     <option value="disabled">$i18n.getString( "disabled" )</option>
     <option value="everyMidNight"#if ( $smsSchedulerStrategy && $smsSchedulerStrategy == "everyMidNight" ) selected="selected"#end>$i18n.getString( "every_mid_night" )</option>
+    
 </select>
+<input type="button" style="width:140px" onclick="window.location.href='executeTask.action?taskKey=sendScheduledMessageTaskNow'" value="$i18n.getString( 'Run Now' )"/>
 </div>
-
 
 <!-- Submit -->
 
