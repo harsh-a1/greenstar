@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <tstamp>
+    <format property="now" pattern="yyyy-MM-dd HH:mm:ss"/>
+  </tstamp>
+  <mkdir dir="/home/harsh/source/launchpad/dhis2/dhis-2/dhis-services/dhis-service-core/target/classes"/>
+  <exec failifexecutionfails="false" outputproperty="revision" executable="bzr">
+    <arg value="revno"/>
+    <arg value="--tree"/>
+  </exec>
+  <echo file="/home/harsh/source/launchpad/dhis2/dhis-2/dhis-services/dhis-service-core/target/classes/build.properties" message="build.version = 2.23-SNAPSHOT&#10;build.time = ${now}&#10;build.revision = ${revision}&#10;"/>
+</target>
+</project>
